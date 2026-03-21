@@ -4,7 +4,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class CrateListener implements Listener {
@@ -14,45 +13,39 @@ public class CrateListener implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         if (e.getClickedBlock() == null) return;
-        String crateName = plugin.getCrateManager().getCrateAt(e.getClickedBlock().getLocation());
-        if (crateName != null) {
+        String name = plugin.getCrateManager().getCrateAt(e.getClickedBlock().getLocation());
+        if (name != null) {
             e.setCancelled(true);
-            Player p = e.getPlayer();
-            plugin.getCrateManager().openPreview(p, crateName);
-            if (plugin.getCrateManager().hasCorrectKey(p, crateName)) {
-                plugin.getServer().getScheduler().runTaskLater(plugin, () -> 
-                    plugin.getCrateManager().openConfirmMenu(p, crateName), 30L);
-            }
+            plugin.getCrateManager().openPreview(e.getPlayer(), name);
         }
     }
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
         String title = e.getView().getTitle();
-        if (title.startsWith("Confirm: ")) {
-            e.setCancelled(true);
-            Player p = (Player) e.getWhoClicked();
-            String name = title.replace("Confirm: ", "");
-            if (e.getRawSlot() == 3) {
-                plugin.getCrateManager().takeKey(p, name);
-                plugin.getCrateManager().giveRandomReward(p, name);
-                p.closeInventory();
-                p.sendMessage("§a✔ Bạn đã mở rương thành công!");
-            } else if (e.getRawSlot() == 5) {
-                p.closeInventory();
-            }
-        } else if (title.startsWith("Preview: ")) {
-            e.setCancelled(true);
-        }
-    }
+        Player p = (Player) e.getWhoClicked();
+        var cfg = plugin.getConfig();
 
-    @EventHandler
-    public void onClose(InventoryCloseEvent e) {
-        String title = e.getView().getTitle();
-        if (title.startsWith("Editing: ")) {
-            String name = title.replace("Editing: ", "");
-            plugin.getCrateManager().saveCrateItems(name, e.getInventory());
-            e.getPlayer().sendMessage("§a[ArisCrate] Đã lưu phần thưởng rương!");
+        if (title.startsWith("Preview: ")) {
+            e.setCancelled(true);
+            if (e.getCurrentItem() == null) return;
+            String crateName = title.replace("Preview: ", "");
+            if (plugin.getCrateManager().getKeys(p.getName(), crateName) > 0) {
+                plugin.getCrateManager().openConfirmMenu(p, crateName);
+            } else {
+                plugin.sendMsg(p, "no-key", "%crate%", crateName);
+            }
+        } else if (title.contains(cfg.getString("confirm-gui.title").split("%")[0].replace("&", "§"))) {
+            e.setCancelled(true);
+            String crateName = title.split(": ")[1].replace("§1", "");
+            int slot = e.getRawSlot();
+            if (slot == cfg.getInt("confirm-gui.confirm-item.slot")) {
+                if (plugin.getCrateManager().takeKey(p.getName(), crateName)) {
+                    plugin.getCrateManager().giveRandomReward(p, crateName);
+                    plugin.sendMsg(p, "open-success", "%crate%", crateName);
+                }
+                p.closeInventory();
+            } else if (slot == cfg.getInt("confirm-gui.cancel-item.slot")) p.closeInventory();
         }
     }
-}
+            }
