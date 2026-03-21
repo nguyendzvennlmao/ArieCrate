@@ -10,22 +10,26 @@ public class CrateCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender s, Command c, String l, String[] args) {
-        if (!(s instanceof Player p) || args.length < 2) return true;
+        if (!(s instanceof Player)) return true; // Sửa lỗi instanceof
+        Player p = (Player) s;
+        
+        if (args.length < 2) return true;
         String sub = args[0].toLowerCase();
         String name = args[1];
+        
         if (sub.equals("create")) plugin.getCrateManager().createCrate(name, p.getLocation());
         else if (sub.equals("edit")) plugin.getCrateManager().openEditMenu(p, name);
         else if (sub.equals("movehere")) plugin.getCrateManager().createCrate(name, p.getLocation());
-        else if (sub.equals("delete")) { plugin.getCrateConfig().set("crates." + name, null); plugin.saveCrateConfig(); }
+        else if (sub.equals("delete")) { 
+            plugin.getCrateConfig().set("crates." + name, null); 
+            plugin.saveCrateConfig(); 
+        }
         return true;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender s, Command c, String a, String[] args) {
         if (args.length == 1) return List.of("create", "edit", "movehere", "delete");
-        if (args.length == 2 && plugin.getCrateConfig().getConfigurationSection("crates") != null) {
-            return new ArrayList<>(plugin.getCrateConfig().getConfigurationSection("crates").getKeys(false));
-        }
         return Collections.emptyList();
     }
-          }
+    }
