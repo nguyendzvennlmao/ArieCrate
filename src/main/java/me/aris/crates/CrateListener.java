@@ -79,4 +79,4 @@ public class CrateListener implements Listener {
         String title = e.getView().getTitle();
         if (title.contains("ʀưᴏ̛ɴɢ") || title.contains("xáᴄ ɴʜậɴ")) e.setCancelled(true);
     }
-            }
+                                   }
