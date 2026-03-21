@@ -1,0 +1,12 @@
+# ArisCrate Config
+settings:
+  prefix: "&6[&bArisCrate&6] &f"
+  no-permission: "&cBạn không có quyền thực hiện hành động này!"
+  reload: "&aĐã tải lại cấu hình thành công."
+
+# Cài đặt mặc định khi tạo rương mới
+crate-defaults:
+  rows: 3
+  open-effect: true
+  # Âm thanh khi mở rương (Dùng tên Sound của Spigot/Paper)
+  sound: BLOCK_CHEST_OPEN
