@@ -1,14 +1,16 @@
 confirm-gui:
   cancel-slot: 11
-  display-slot: 13
-  confirm-slot: 15
   cancel:
     material: RED_STAINED_GLASS_PANE
     name: "&#fc0404✖ HỦY BỎ"
-    lore: 
-      - "&fThoát giao diện"
+    lore:
+      - "&7Nhấn để quay lại"
+      - "&7không mất chìa khóa."
+  display-slot: 13
+  confirm-slot: 15
   confirm:
     material: LIME_STAINED_GLASS_PANE
     name: "&#04fc04✔ XÁC NHẬN"
-    lore: 
-      - "&fDùng 1 chìa khóa để nhận"
+    lore:
+      - "&7Nhấn để sử dụng &f1 chìa khóa"
+      - "&7và nhận vật phẩm này."
