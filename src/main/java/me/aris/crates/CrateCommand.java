@@ -47,4 +47,4 @@ public class CrateCommand implements TabExecutor {
         if (args.length == 1) return Arrays.asList("create", "edit", "movehere", "delete", "givekey");
         return Collections.emptyList();
     }
-    }
+                }
