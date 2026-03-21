@@ -1,8 +1,6 @@
 package me.aris.crates;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -49,24 +47,10 @@ public class CrateManager {
         else r.run();
     }
 
-    public FileConfiguration getCrateConfig(String crateName) {
-        File file = new File(plugin.getDataFolder() + "/crates", crateName + ".yml");
-        if (!file.exists()) {
-            try {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-                FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-                cfg.set("menu-title", "&#facc15ʀưᴏ̛ɴɢ " + toSmallCaps(crateName.toUpperCase()));
-                cfg.save(file);
-            } catch (Exception e) {}
-        }
-        return YamlConfiguration.loadConfiguration(file);
-    }
-
     public void openPreview(Player p, String c) {
         runTask(p, () -> {
             FileConfiguration cfg = getCrateConfig(c);
-            String title = translateHex(cfg.getString("menu-title", "Xem rương: " + c));
+            String title = translateHex(cfg.getString("menu-title", "&#facc15ʀưᴏ̛ɴɢ " + toSmallCaps(c.toUpperCase())));
             Inventory inv = Bukkit.createInventory(null, 27, title);
             if (cfg.contains("rewards")) {
                 for (String key : cfg.getConfigurationSection("rewards").getKeys(false)) {
@@ -74,6 +58,7 @@ public class CrateManager {
                 }
             }
             p.openInventory(inv);
+            p.playSound(p.getLocation(), Sound.BLOCK_CHEST_OPEN, 1f, 1f);
         });
     }
 
@@ -84,39 +69,22 @@ public class CrateManager {
             Inventory inv = Bukkit.createInventory(null, 27, title);
             var cfg = plugin.getConfig();
             inv.setItem(cfg.getInt("confirm-gui.cancel-slot"), createItem(cfg.getString("confirm-gui.cancel.material"), cfg.getString("confirm-gui.cancel.name"), cfg.getStringList("confirm-gui.cancel.lore")));
-            inv.setItem(cfg.getInt("confirm-gui.display-slot"), selectedItem);
+            inv.setItem(cfg.getInt("confirm-gui.display-slot"), selectedItem.clone());
             inv.setItem(cfg.getInt("confirm-gui.confirm-slot"), createItem(cfg.getString("confirm-gui.confirm.material"), cfg.getString("confirm-gui.confirm.name"), cfg.getStringList("confirm-gui.confirm.lore")));
             p.openInventory(inv);
+            p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1.2f);
         });
     }
 
-    public void openEditMenu(Player p, String name) {
-        runTask(p, () -> {
-            Inventory inv = Bukkit.createInventory(null, 27, "Editing: " + name);
-            FileConfiguration cfg = getCrateConfig(name);
-            if (cfg.contains("rewards")) {
-                for (String key : cfg.getConfigurationSection("rewards").getKeys(false)) {
-                    inv.setItem(Integer.parseInt(key), cfg.getItemStack("rewards." + key));
-                }
-            }
-            p.openInventory(inv);
-        });
-    }
-
-    public void saveCrateItems(String name, Inventory inv) {
-        FileConfiguration cfg = getCrateConfig(name);
-        cfg.set("rewards", null);
-        for (int i = 0; i < inv.getSize(); i++) {
-            if (inv.getItem(i) != null) cfg.set("rewards." + i, inv.getItem(i).clone());
-        }
-        try { cfg.save(new File(plugin.getDataFolder() + "/crates", name + ".yml")); } catch (Exception e) {}
+    public FileConfiguration getCrateConfig(String crateName) {
+        File file = new File(plugin.getDataFolder() + "/crates", crateName + ".yml");
+        return YamlConfiguration.loadConfiguration(file);
     }
 
     public String getCrateAt(Location loc) {
         File folder = new File(plugin.getDataFolder(), "crates");
         if (!folder.exists() || folder.listFiles() == null) return null;
         for (File file : folder.listFiles()) {
-            if (!file.getName().endsWith(".yml")) continue;
             FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
             if (cfg.contains("location") && 
                 cfg.getString("location.world", "").equals(loc.getWorld().getName()) &&
@@ -143,9 +111,13 @@ public class CrateManager {
     }
 
     public void giveKey(Player target, String crateName, int amount) {
-        int current = plugin.getKeyConfig().getInt(target.getName() + "." + crateName, 0);
-        plugin.getKeyConfig().set(target.getName() + "." + crateName, current + amount);
+        String path = target.getName() + "." + crateName;
+        int current = plugin.getKeyConfig().getInt(path, 0);
+        plugin.getKeyConfig().set(path, current + amount);
         plugin.saveKeyConfig();
+        plugin.sendMsg(target, "receive-key", "%amount%", String.valueOf(amount), "%crate%", crateName);
+        String s = plugin.getMsgConfig().getString("messages.receive-key.sound", "ENTITY_PLAYER_LEVELUP");
+        target.playSound(target.getLocation(), Sound.valueOf(s), 1f, 1f);
     }
 
     public boolean takeKey(String p, String c) {
@@ -155,4 +127,4 @@ public class CrateManager {
         plugin.saveKeyConfig();
         return true;
     }
-                        }
+               }
