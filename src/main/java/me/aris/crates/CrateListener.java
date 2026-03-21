@@ -16,11 +16,11 @@ public class CrateListener implements Listener {
         String title = e.getView().getTitle();
         Player p = (Player) e.getWhoClicked();
 
-        if (title.contains("Preview:") || title.contains("Xác nhận:")) {
+        if (title.contains("Xem rương:") || title.contains("Xác nhận:")) {
             e.setCancelled(true);
             if (e.getClickedInventory() == e.getView().getBottomInventory()) return;
             
-            if (title.contains("Preview:")) {
+            if (title.contains("Xem rương:")) {
                 ItemStack item = e.getCurrentItem();
                 if (item == null || item.getType().isAir()) return;
                 String crateName = title.split(": ")[1].trim();
@@ -57,4 +57,4 @@ public class CrateListener implements Listener {
         String name = plugin.getCrateManager().getCrateAt(e.getClickedBlock().getLocation());
         if (name != null) { e.setCancelled(true); plugin.getCrateManager().openPreview(e.getPlayer(), name); }
     }
-                                                                         }
+            }
