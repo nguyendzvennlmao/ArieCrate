@@ -7,3 +7,8 @@ messages:
     text: "&a[!] Bạn đã mở rương %crate% thành công!"
     chat: true
     actionbar: false
+  give-key-success:
+    text: "&e[Crate] Đã tặng %amount% key %crate% cho %player%."
+    chat: true
+    actionbar: false
+  prefix: "&b&lArisCrate &8» "
