@@ -1,14 +1,22 @@
 messages:
   no-key:
-    text: "&c[!] Bạn không có chìa khóa rương %crate%!"
+    text: "&#fc0404⚠ Bạn không có chìa khóa rương %crate%!"
     chat: true
     actionbar: true
+    sound: "ENTITY_VILLAGER_NO"
   open-success:
-    text: "&a[!] Bạn đã mở rương %crate% thành công!"
+    text: "&#04fc04✦ Chúc mừng! Bạn nhận được vật phẩm từ rương %crate%!"
     chat: true
-    actionbar: false
-  give-key-success:
-    text: "&e[Crate] Đã tặng %amount% key %crate% cho %player%."
+    actionbar: true
+    sound: "ENTITY_PLAYER_LEVELUP"
+  crate-create:
+    text: "&#04fc04✔ Đã thiết lập rương thành công: %crate%"
     chat: true
-    actionbar: false
-  prefix: "&b&lArisCrate &8» "
+    sound: "BLOCK_ANVIL_USE"
+  inv-full:
+    text: "&#fc0404⚠ Kho đồ của bạn đã đầy!"
+    chat: true
+    actionbar: true
+  reload-success:
+    text: "&#04fc04✔ Đã tải lại cấu hình hệ thống thành công!"
+    chat: true
