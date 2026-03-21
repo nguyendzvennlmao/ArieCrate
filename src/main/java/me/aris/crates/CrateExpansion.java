@@ -21,4 +21,4 @@ public class CrateExpansion extends PlaceholderExpansion {
         }
         return String.valueOf(count);
     }
-}
+        }
