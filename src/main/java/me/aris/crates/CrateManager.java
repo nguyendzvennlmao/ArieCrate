@@ -54,7 +54,7 @@ public class CrateManager {
     public void openPreview(Player p, String c) {
         runTask(p, () -> {
             FileConfiguration cfg = getCrateConfig(c);
-            String title = translateHex(cfg.getString("menu-title", "Preview: " + c));
+            String title = translateHex(cfg.getString("menu-title", "Xem rương: " + c));
             Inventory inv = Bukkit.createInventory(null, 27, title);
             if (cfg.contains("rewards")) {
                 for (String key : cfg.getConfigurationSection("rewards").getKeys(false)) {
@@ -94,7 +94,7 @@ public class CrateManager {
         FileConfiguration cfg = getCrateConfig(name);
         cfg.set("rewards", null);
         for (int i = 0; i < inv.getSize(); i++) {
-            if (inv.getItem(i) != null) cfg.set("rewards." + i, inv.getItem(i));
+            if (inv.getItem(i) != null) cfg.set("rewards." + i, inv.getItem(i).clone());
         }
         try { cfg.save(new File(plugin.getDataFolder() + "/crates", name + ".yml")); } catch (Exception e) {}
     }
@@ -105,7 +105,8 @@ public class CrateManager {
         for (File file : folder.listFiles()) {
             if (!file.getName().endsWith(".yml")) continue;
             FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-            if (cfg.getString("location.world", "").equals(loc.getWorld().getName()) &&
+            if (cfg.contains("location") && 
+                cfg.getString("location.world", "").equals(loc.getWorld().getName()) &&
                 cfg.getInt("location.x") == loc.getBlockX() &&
                 cfg.getInt("location.y") == loc.getBlockY() &&
                 cfg.getInt("location.z") == loc.getBlockZ()) {
@@ -141,4 +142,4 @@ public class CrateManager {
         plugin.saveKeyConfig();
         return true;
     }
-                        }
+                                                      }
