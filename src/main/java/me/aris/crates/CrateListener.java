@@ -1,14 +1,10 @@
 package me.aris.crates;
 
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.*;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import net.md_5.bungee.api.ChatColor;
 
 public class CrateListener implements Listener {
     private final ArisCrate plugin;
@@ -20,40 +16,29 @@ public class CrateListener implements Listener {
         String title = e.getView().getTitle();
         Player p = (Player) e.getWhoClicked();
 
-        if (e.getClickedInventory() == e.getView().getBottomInventory()) {
-            if (title.contains("Preview:") || title.contains("Xác nhận:")) e.setCancelled(true);
-            return;
-        }
-
-        if (title.contains("Preview:")) {
+        if (title.contains("Preview:") || title.contains("Xác nhận:")) {
             e.setCancelled(true);
-            ItemStack item = e.getCurrentItem();
-            if (item == null || item.getType().isAir()) return;
-            String crateName = title.split(": ")[1].trim();
-            if (plugin.getKeyConfig().getInt(p.getName() + "." + crateName, 0) > 0) {
-                plugin.getCrateManager().openConfirmMenu(p, crateName, item);
-            } else {
-                plugin.sendMsg(p, "no-key", "%crate%", crateName);
-            }
-        } 
-        else if (title.contains("Xác nhận:")) {
-            e.setCancelled(true);
-            int slot = e.getRawSlot();
-            String crateName = ChatColor.stripColor(title).split(": ")[1].trim();
+            if (e.getClickedInventory() == e.getView().getBottomInventory()) return;
             
-            if (slot == plugin.getConfig().getInt("confirm-gui.confirm-slot", 15)) {
-                if (p.getInventory().firstEmpty() == -1) {
-                    plugin.sendMsg(p, "inv-full");
-                    return;
-                }
-                ItemStack item = e.getInventory().getItem(plugin.getConfig().getInt("confirm-gui.display-slot", 13));
-                if (item != null && plugin.getCrateManager().takeKey(p.getName(), crateName)) {
-                    p.getInventory().addItem(item.clone());
-                    plugin.sendMsg(p, "open-success", "%crate%", crateName);
-                    p.closeInventory();
-                }
-            } else if (slot == plugin.getConfig().getInt("confirm-gui.cancel-slot", 11)) {
-                p.closeInventory();
+            if (title.contains("Preview:")) {
+                ItemStack item = e.getCurrentItem();
+                if (item == null || item.getType().isAir()) return;
+                String crateName = title.split(": ")[1].trim();
+                plugin.getCrateManager().openConfirmMenu(p, crateName, item);
+            } 
+            else if (title.contains("Xác nhận:")) {
+                int slot = e.getRawSlot();
+                String crateName = p.hasMetadata("opening_crate") ? p.getMetadata("opening_crate").get(0).asString() : "";
+                
+                if (slot == plugin.getConfig().getInt("confirm-gui.confirm-slot")) {
+                    if (p.getInventory().firstEmpty() == -1) { plugin.sendMsg(p, "inv-full"); return; }
+                    ItemStack item = e.getInventory().getItem(plugin.getConfig().getInt("confirm-gui.display-slot"));
+                    if (item != null && plugin.getCrateManager().takeKey(p.getName(), crateName)) {
+                        p.getInventory().addItem(item.clone());
+                        plugin.sendMsg(p, "open-success", "%crate%", crateName);
+                        p.closeInventory();
+                    } else { plugin.sendMsg(p, "no-key", "%crate%", crateName); p.closeInventory(); }
+                } else if (slot == plugin.getConfig().getInt("confirm-gui.cancel-slot")) { p.closeInventory(); }
             }
         }
     }
@@ -70,9 +55,6 @@ public class CrateListener implements Listener {
     public void onInteract(PlayerInteractEvent e) {
         if (e.getClickedBlock() == null) return;
         String name = plugin.getCrateManager().getCrateAt(e.getClickedBlock().getLocation());
-        if (name != null) {
-            e.setCancelled(true);
-            plugin.getCrateManager().openPreview(e.getPlayer(), name);
-        }
+        if (name != null) { e.setCancelled(true); plugin.getCrateManager().openPreview(e.getPlayer(), name); }
     }
-                    }
+                                                                         }
