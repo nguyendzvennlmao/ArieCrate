@@ -7,22 +7,63 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import java.util.Random;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CrateManager {
     private final ArisCrate plugin;
     public CrateManager(ArisCrate plugin) { this.plugin = plugin; }
 
-    public void createCrate(String name, Location loc) {
-        String path = "crates." + name;
-        plugin.getCrateConfig().set(path + ".location.world", loc.getWorld().getName());
-        plugin.getCrateConfig().set(path + ".location.x", loc.getBlockX());
-        plugin.getCrateConfig().set(path + ".location.y", loc.getBlockY());
-        plugin.getCrateConfig().set(path + ".location.z", loc.getBlockZ());
-        plugin.getCrateConfig().set(path + ".rows", 3);
-        plugin.saveCrateConfig();
+    // Thêm key vào đúng loại rương (Ví dụ: crimson, common)
+    public void addKey(String playerName, String crateName, int amount) {
+        int current = plugin.getKeyConfig().getInt(playerName + "." + crateName, 0);
+        plugin.getKeyConfig().set(playerName + "." + crateName, current + amount);
+        plugin.saveKeyConfig();
+    }
+
+    // Lấy số lượng key của đúng loại rương
+    public int getKeys(String playerName, String crateName) {
+        return plugin.getKeyConfig().getInt(playerName + "." + crateName, 0);
+    }
+
+    // Trừ key của đúng loại rương khi mở
+    public boolean takeKey(String playerName, String crateName) {
+        int current = getKeys(playerName, crateName);
+        if (current <= 0) return false;
+        plugin.getKeyConfig().set(playerName + "." + crateName, current - 1);
+        plugin.saveKeyConfig();
+        return true;
+    }
+
+    public void openPreview(Player p, String crateName) {
+        int rows = plugin.getCrateConfig().getInt("crates." + crateName + ".rows", 3);
+        // Đặt tiêu đề GUI chứa ID rương để Listener nhận diện đúng rương nào đang được mở
+        Inventory inv = Bukkit.createInventory(null, rows * 9, "Preview: " + crateName);
+        if (plugin.getCrateConfig().contains("crates." + crateName + ".rewards")) {
+            for (String key : plugin.getCrateConfig().getConfigurationSection("crates." + crateName + ".rewards").getKeys(false)) {
+                inv.setItem(Integer.parseInt(key), plugin.getCrateConfig().getItemStack("crates." + crateName + ".rewards." + key));
+            }
+        }
+        p.openInventory(inv);
+    }
+
+    public void openConfirmMenu(Player p, String crateName) {
+        Inventory inv = Bukkit.createInventory(null, 9, "Confirm: " + crateName);
+        ItemStack yes = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
+        ItemMeta ym = yes.getItemMeta(); ym.setDisplayName("§a§lXÁC NHẬN MỞ " + crateName.toUpperCase()); yes.setItemMeta(ym);
+        ItemStack no = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+        ItemMeta nm = no.getItemMeta(); nm.setDisplayName("§c§lHỦY BỎ"); no.setItemMeta(nm);
+        inv.setItem(3, yes); inv.setItem(5, no);
+        p.openInventory(inv);
+    }
+
+    public void giveRandomReward(Player p, String crateName) {
+        var section = plugin.getCrateConfig().getConfigurationSection("crates." + crateName + ".rewards");
+        if (section == null) return;
+        List<String> keys = new ArrayList<>(section.getKeys(false));
+        if (keys.isEmpty()) return;
+        String rKey = keys.get(new Random().nextInt(keys.size()));
+        ItemStack item = plugin.getCrateConfig().getItemStack("crates." + crateName + ".rewards." + rKey);
+        if (item != null) p.getInventory().addItem(item.clone());
     }
 
     public String getCrateAt(Location loc) {
@@ -37,56 +78,14 @@ public class CrateManager {
         return null;
     }
 
-    public void openPreview(Player p, String crateName) {
-        int rows = plugin.getCrateConfig().getInt("crates." + crateName + ".rows", 3);
-        Inventory inv = Bukkit.createInventory(null, rows * 9, "Preview: " + crateName);
-        if (plugin.getCrateConfig().contains("crates." + crateName + ".rewards")) {
-            for (String key : plugin.getCrateConfig().getConfigurationSection("crates." + crateName + ".rewards").getKeys(false)) {
-                inv.setItem(Integer.parseInt(key), plugin.getCrateConfig().getItemStack("crates." + crateName + ".rewards." + key));
-            }
-        }
-        p.openInventory(inv);
-    }
-
-    public void openConfirmMenu(Player p, String crateName) {
-        Inventory inv = Bukkit.createInventory(null, 9, "Confirm: " + crateName);
-        ItemStack yes = new ItemStack(Material.LIME_WOOL);
-        ItemMeta ym = yes.getItemMeta(); ym.setDisplayName("§a§lXÁC NHẬN MỞ"); yes.setItemMeta(ym);
-        ItemStack no = new ItemStack(Material.RED_WOOL);
-        ItemMeta nm = no.getItemMeta(); nm.setDisplayName("§c§lHỦY BỎ"); no.setItemMeta(nm);
-        inv.setItem(3, yes); inv.setItem(5, no);
-        p.openInventory(inv);
-    }
-
-    public boolean hasCorrectKey(Player p, String crateName) {
-        String keyName = plugin.getCrateConfig().getString("crates." + crateName + ".key.name", "").replace("&", "§");
-        for (ItemStack item : p.getInventory().getContents()) {
-            if (item != null && item.hasItemMeta() && item.getItemMeta().getDisplayName().equals(keyName)) return true;
-        }
-        return false;
-    }
-
-    public void takeKey(Player p, String crateName) {
-        String keyName = plugin.getCrateConfig().getString("crates." + crateName + ".key.name", "").replace("&", "§");
-        ItemStack[] contents = p.getInventory().getContents();
-        for (int i = 0; i < contents.length; i++) {
-            ItemStack item = contents[i];
-            if (item != null && item.hasItemMeta() && item.getItemMeta().getDisplayName().equals(keyName)) {
-                if (item.getAmount() > 1) item.setAmount(item.getAmount() - 1);
-                else p.getInventory().setItem(i, null);
-                return;
-            }
-        }
-    }
-
-    public void giveRandomReward(Player p, String crateName) {
-        var section = plugin.getCrateConfig().getConfigurationSection("crates." + crateName + ".rewards");
-        if (section == null) return;
-        List<String> keys = new ArrayList<>(section.getKeys(false));
-        if (keys.isEmpty()) return;
-        String randomKey = keys.get(new Random().nextInt(keys.size()));
-        ItemStack reward = plugin.getCrateConfig().getItemStack("crates." + crateName + ".rewards." + randomKey);
-        if (reward != null) p.getInventory().addItem(reward.clone());
+    public void createCrate(String name, Location loc) {
+        String path = "crates." + name;
+        plugin.getCrateConfig().set(path + ".location.world", loc.getWorld().getName());
+        plugin.getCrateConfig().set(path + ".location.x", loc.getBlockX());
+        plugin.getCrateConfig().set(path + ".location.y", loc.getBlockY());
+        plugin.getCrateConfig().set(path + ".location.z", loc.getBlockZ());
+        plugin.getCrateConfig().set(path + ".rows", 3);
+        plugin.saveCrateConfig();
     }
 
     public void openEditMenu(Player p, String name) {
@@ -99,22 +98,4 @@ public class CrateManager {
         }
         p.openInventory(inv);
     }
-
-    public void saveCrateItems(String name, Inventory inv) {
-        plugin.getCrateConfig().set("crates." + name + ".rewards", null);
-        for (int i = 0; i < inv.getSize(); i++) {
-            ItemStack item = inv.getItem(i);
-            if (item != null) plugin.getCrateConfig().set("crates." + name + ".rewards." + i, item);
-        }
-        plugin.saveCrateConfig();
     }
-
-    public void giveKey(Player t, String name, int amount) {
-        String mat = plugin.getCrateConfig().getString("crates." + name + ".key.material", "TRIPWIRE_HOOK");
-        String dname = plugin.getCrateConfig().getString("crates." + name + ".key.name", "&eKey " + name).replace("&", "§");
-        ItemStack key = new ItemStack(Material.valueOf(mat.toUpperCase()), amount);
-        ItemMeta m = key.getItemMeta(); 
-        if (m != null) { m.setDisplayName(dname); key.setItemMeta(m); }
-        if (t != null) t.getInventory().addItem(key);
-    }
-                                    }
