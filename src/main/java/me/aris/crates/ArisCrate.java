@@ -52,4 +52,4 @@ public class ArisCrate extends JavaPlugin {
     public static ArisCrate getInstance() { return instance; }
     public CrateManager getCrateManager() { return crateManager; }
     public FileConfiguration getCrateConfig() { return crateConfig; }
-            }
+}
