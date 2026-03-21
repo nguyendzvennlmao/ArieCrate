@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.md_5.bungee.api.ChatColor;
 
 public class CrateManager {
     private final ArisCrate plugin;
@@ -19,27 +20,27 @@ public class CrateManager {
         Inventory inv = Bukkit.createInventory(null, 27, "§8Xác nhận: §1" + crateName);
         var cfg = plugin.getConfig();
 
-        // 1. Nút Hủy (Slot 11)
+        // Nút Hủy (11)
         ItemStack cancel = new ItemStack(Material.valueOf(cfg.getString("confirm-gui.cancel.material", "RED_STAINED_GLASS_PANE")));
         ItemMeta nm = cancel.getItemMeta();
         nm.setDisplayName(translateHex(cfg.getString("confirm-gui.cancel.name")));
         List<String> nl = new ArrayList<>();
-        for (String s : cfg.getStringList("confirm-gui.cancel.lore")) nl.add(s.replace("&", "§"));
+        for (String s : cfg.getStringList("confirm-gui.cancel.lore")) nl.add(translateHex(s));
         nm.setLore(nl);
         cancel.setItemMeta(nm);
 
-        // 2. Nút Xác nhận (Slot 15)
+        // Nút Xác nhận (15)
         ItemStack confirm = new ItemStack(Material.valueOf(cfg.getString("confirm-gui.confirm.material", "LIME_STAINED_GLASS_PANE")));
         ItemMeta cm = confirm.getItemMeta();
         cm.setDisplayName(translateHex(cfg.getString("confirm-gui.confirm.name")));
         List<String> cl = new ArrayList<>();
-        for (String s : cfg.getStringList("confirm-gui.confirm.lore")) cl.add(s.replace("&", "§"));
+        for (String s : cfg.getStringList("confirm-gui.confirm.lore")) cl.add(translateHex(s));
         cm.setLore(cl);
         confirm.setItemMeta(cm);
 
-        inv.setItem(cfg.getInt("confirm-gui.cancel.slot", 11), cancel);
-        inv.setItem(cfg.getInt("confirm-gui.item-display.slot", 13), selectedItem);
-        inv.setItem(cfg.getInt("confirm-gui.confirm.slot", 15), confirm);
+        inv.setItem(cfg.getInt("confirm-gui.cancel-slot", 11), cancel);
+        inv.setItem(cfg.getInt("confirm-gui.display-slot", 13), selectedItem); // Hiện item đã chọn
+        inv.setItem(cfg.getInt("confirm-gui.confirm-slot", 15), confirm);
 
         p.openInventory(inv);
     }
@@ -50,15 +51,9 @@ public class CrateManager {
         Matcher matcher = pattern.matcher(message);
         StringBuilder buffer = new StringBuilder();
         while (matcher.find()) {
-            matcher.appendReplacement(buffer, net.md_5.bungee.api.ChatColor.of("#" + matcher.group(1)).toString());
+            matcher.appendReplacement(buffer, ChatColor.of("#" + matcher.group(1)).toString());
         }
         return matcher.appendTail(buffer).toString().replace("&", "§");
-    }
-
-    public void giveKey(Player target, String crateName, int amount) {
-        int current = plugin.getKeyConfig().getInt(target.getName() + "." + crateName, 0);
-        plugin.getKeyConfig().set(target.getName() + "." + crateName, current + amount);
-        plugin.saveKeyConfig();
     }
 
     public int getKeys(String playerName, String crateName) {
@@ -94,4 +89,10 @@ public class CrateManager {
         }
         return null;
     }
-                    }
+
+    public void giveKey(Player target, String crateName, int amount) {
+        int current = getKeys(target.getName(), crateName);
+        plugin.getKeyConfig().set(target.getName() + "." + crateName, current + amount);
+        plugin.saveKeyConfig();
+    }
+            }
