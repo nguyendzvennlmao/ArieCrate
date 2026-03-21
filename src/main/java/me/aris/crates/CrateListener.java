@@ -16,4 +16,4 @@ public class CrateListener implements Listener {
             e.getPlayer().sendMessage("§a[ArisCrate] Đã tự động lưu vật phẩm rương!");
         }
     }
-          }
+}
