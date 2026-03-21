@@ -1,20 +1,18 @@
 confirm-gui:
   title: "&8Xác nhận: &1%crate%"
-  # Slot 11: Hủy
+  # Cấu hình Slot
+  cancel-slot: 11
+  display-slot: 13
+  confirm-slot: 15
+  
+  # Cấu hình Item
   cancel:
-    slot: 11
     material: RED_STAINED_GLASS_PANE
     name: '&#fc0404ᴄᴀɴᴄᴇʟ'
     lore:
       - '&fClick to cancel the sale'
-  
-  # Slot 13: Vật phẩm hiển thị (Tự động lấy từ item bạn đã chọn)
-  item-display:
-    slot: 13
-
-  # Slot 15: Xác nhận
+      
   confirm:
-    slot: 15
     material: LIME_STAINED_GLASS_PANE
     name: '&#04fc04ᴄᴏɴғɪʀᴍ'
     lore:
