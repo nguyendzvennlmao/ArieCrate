@@ -1,8 +1,22 @@
 crates:
   common:
-    display-name: "&aᴄᴏᴍᴍᴏɴ ᴄʀᴀᴛᴇ"
+    location:
+      world: world
+      x: 100
+      y: 64
+      z: 100
     rows: 3
     key:
-      name: "&7ᴋᴇʏ ᴀʟʟ ᴋᴇʏ"
       material: TRIPWIRE_HOOK
-    rewards: {}
+      name: "&eChìa Khóa Thường"
+    rewards:
+      '0':
+        ==: org.bukkit.inventory.ItemStack
+        v: 3465
+        type: DIAMOND
+        amount: 2
+      '1':
+        ==: org.bukkit.inventory.ItemStack
+        v: 3465
+        type: IRON_INGOT
+        amount: 5
