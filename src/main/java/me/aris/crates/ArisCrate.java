@@ -27,6 +27,10 @@ public class ArisCrate extends JavaPlugin {
         getCommand("ariscrate").setExecutor(cmd);
         getCommand("ariscrate").setTabCompleter(cmd);
         getServer().getPluginManager().registerEvents(new CrateListener(this), this);
+        
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new CrateExpansion(this).register();
+        }
     }
 
     public void loadFiles() {
@@ -53,10 +57,13 @@ public class ArisCrate extends JavaPlugin {
         if (msgConfig.getBoolean("messages." + path + ".actionbar", false)) {
             p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(msg));
         }
+        if (msgConfig.contains("messages." + path + ".sound")) {
+            p.playSound(p.getLocation(), org.bukkit.Sound.valueOf(msgConfig.getString("messages." + path + ".sound")), 1f, 1f);
+        }
     }
 
     public boolean isFolia() { return isFolia; }
     public FileConfiguration getKeyConfig() { return keyConfig; }
     public void saveKeyConfig() { try { keyConfig.save(keyFile); } catch (Exception e) {} }
     public CrateManager getCrateManager() { return crateManager; }
-            }
+                                 }
