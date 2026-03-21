@@ -39,12 +39,15 @@ public class ArisCrate extends JavaPlugin {
     }
 
     public void sendMsg(org.bukkit.entity.Player p, String path, String... replace) {
+        if (!msgConfig.contains("messages." + path)) return;
         String msg = msgConfig.getString("messages." + path + ".text", path);
         for (int i = 0; i < replace.length; i += 2) msg = msg.replace(replace[i], replace[i+1]);
         msg = msg.replace("&", "§");
         if (msgConfig.getBoolean("messages." + path + ".chat", true)) p.sendMessage(msg);
-        if (msgConfig.getBoolean("messages." + path + ".actionbar", false)) 
-            p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR, new net.md_5.api.chat.TextComponent(msg));
+        if (msgConfig.getBoolean("messages." + path + ".actionbar", false)) {
+            p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR, 
+                new net.md_5.bungee.api.chat.TextComponent(msg));
+        }
     }
 
     public String getMessage(String path) {
@@ -56,4 +59,4 @@ public class ArisCrate extends JavaPlugin {
     public void saveCrateConfig() { try { crateConfig.save(crateFile); } catch (Exception e) {} }
     public void saveKeyConfig() { try { keyConfig.save(keyFile); } catch (Exception e) {} }
     public CrateManager getCrateManager() { return crateManager; }
-        }
+            }
