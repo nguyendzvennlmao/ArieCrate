@@ -13,9 +13,9 @@ public class CrateManager {
     private final ArisCrate plugin;
     public CrateManager(ArisCrate plugin) { this.plugin = plugin; }
 
-    public void addKey(String playerName, String crateName, int amount) {
-        int current = plugin.getKeyConfig().getInt(playerName + "." + crateName, 0);
-        plugin.getKeyConfig().set(playerName + "." + crateName, current + amount);
+    public void giveKey(Player target, String crateName, int amount) {
+        int current = plugin.getKeyConfig().getInt(target.getName() + "." + crateName, 0);
+        plugin.getKeyConfig().set(target.getName() + "." + crateName, current + amount);
         plugin.saveKeyConfig();
     }
 
@@ -31,6 +31,24 @@ public class CrateManager {
         return true;
     }
 
+    public void openEditMenu(Player p, String name) {
+        Inventory inv = Bukkit.createInventory(null, 27, "Editing: " + name);
+        if (plugin.getCrateConfig().contains("crates." + name + ".rewards")) {
+            for (String key : plugin.getCrateConfig().getConfigurationSection("crates." + name + ".rewards").getKeys(false)) {
+                inv.setItem(Integer.parseInt(key), plugin.getCrateConfig().getItemStack("crates." + name + ".rewards." + key));
+            }
+        }
+        p.openInventory(inv);
+    }
+
+    public void saveCrateItems(String name, Inventory inv) {
+        plugin.getCrateConfig().set("crates." + name + ".rewards", null);
+        for (int i = 0; i < inv.getSize(); i++) {
+            if (inv.getItem(i) != null) plugin.getCrateConfig().set("crates." + name + ".rewards." + i, inv.getItem(i));
+        }
+        plugin.saveCrateConfig();
+    }
+
     public void openPreview(Player p, String crateName) {
         Inventory inv = Bukkit.createInventory(null, 27, "Preview: " + crateName);
         if (plugin.getCrateConfig().contains("crates." + crateName + ".rewards")) {
@@ -43,27 +61,29 @@ public class CrateManager {
     }
 
     public void openConfirmMenu(Player p, String crateName) {
-        var config = plugin.getConfig();
-        String title = config.getString("confirm-gui.title").replace("%crate%", crateName).replace("&", "§");
+        var cfg = plugin.getConfig();
+        String title = cfg.getString("confirm-gui.title", "&8Confirm: %crate%").replace("%crate%", crateName).replace("&", "§");
         Inventory inv = Bukkit.createInventory(null, 27, title);
+        
+        ItemStack confirm = new ItemStack(Material.valueOf(cfg.getString("confirm-gui.confirm-item.material", "LIME_STAINED_GLASS_PANE")));
+        ItemMeta cm = confirm.getItemMeta(); cm.setDisplayName(cfg.getString("confirm-gui.confirm-item.name", "&aXác nhận").replace("&", "§"));
+        confirm.setItemMeta(cm);
+        
+        ItemStack cancel = new ItemStack(Material.valueOf(cfg.getString("confirm-gui.cancel-item.material", "RED_STAINED_GLASS_PANE")));
+        ItemMeta nm = cancel.getItemMeta(); nm.setDisplayName(cfg.getString("confirm-gui.cancel-item.name", "&cHủy").replace("&", "§"));
+        cancel.setItemMeta(nm);
 
-        ItemStack confirm = new ItemStack(Material.valueOf(config.getString("confirm-gui.confirm-item.material")));
-        ItemMeta cm = confirm.getItemMeta();
-        cm.setDisplayName(config.getString("confirm-gui.confirm-item.name").replace("&", "§"));
-        List<String> clore = new ArrayList<>();
-        for(String s : config.getStringList("confirm-gui.confirm-item.lore")) clore.add(s.replace("%crate%", crateName).replace("&", "§"));
-        cm.setLore(clore); confirm.setItemMeta(cm);
-
-        ItemStack cancel = new ItemStack(Material.valueOf(config.getString("confirm-gui.cancel-item.material")));
-        ItemMeta nm = cancel.getItemMeta();
-        nm.setDisplayName(config.getString("confirm-gui.cancel-item.name").replace("&", "§"));
-        List<String> nlore = new ArrayList<>();
-        for(String s : config.getStringList("confirm-gui.cancel-item.lore")) nlore.add(s.replace("&", "§"));
-        nm.setLore(nlore); cancel.setItemMeta(nm);
-
-        inv.setItem(config.getInt("confirm-gui.confirm-item.slot"), confirm);
-        inv.setItem(config.getInt("confirm-gui.cancel-item.slot"), cancel);
+        inv.setItem(cfg.getInt("confirm-gui.confirm-item.slot", 13), confirm);
+        inv.setItem(cfg.getInt("confirm-gui.cancel-item.slot", 11), cancel);
         p.openInventory(inv);
+    }
+
+    public void createCrate(String name, Location loc) {
+        plugin.getCrateConfig().set("crates." + name + ".location.world", loc.getWorld().getName());
+        plugin.getCrateConfig().set("crates." + name + ".location.x", loc.getBlockX());
+        plugin.getCrateConfig().set("crates." + name + ".location.y", loc.getBlockY());
+        plugin.getCrateConfig().set("crates." + name + ".location.z", loc.getBlockZ());
+        plugin.saveCrateConfig();
     }
 
     public void giveRandomReward(Player p, String crateName) {
@@ -86,13 +106,4 @@ public class CrateManager {
         }
         return null;
     }
-
-    public void createCrate(String name, Location loc) {
-        String path = "crates." + name;
-        plugin.getCrateConfig().set(path + ".location.world", loc.getWorld().getName());
-        plugin.getCrateConfig().set(path + ".location.x", loc.getBlockX());
-        plugin.getCrateConfig().set(path + ".location.y", loc.getBlockY());
-        plugin.getCrateConfig().set(path + ".location.z", loc.getBlockZ());
-        plugin.saveCrateConfig();
     }
-                    }
