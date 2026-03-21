@@ -15,7 +15,9 @@ public class ArisCrate extends JavaPlugin {
         saveDefaultConfig();
         loadFiles();
         crateManager = new CrateManager(this);
-        getCommand("ariscrate").setExecutor(new CrateCommand(this));
+        CrateCommand cmd = new CrateCommand(this);
+        getCommand("ariscrate").setExecutor(cmd);
+        getCommand("ariscrate").setTabCompleter(cmd);
         getServer().getPluginManager().registerEvents(new CrateListener(this), this);
     }
 
@@ -44,4 +46,4 @@ public class ArisCrate extends JavaPlugin {
     public void saveCrateConfig() { try { crateConfig.save(crateFile); } catch (Exception e) {} }
     public void saveKeyConfig() { try { keyConfig.save(keyFile); } catch (Exception e) {} }
     public CrateManager getCrateManager() { return crateManager; }
-            }
+}
