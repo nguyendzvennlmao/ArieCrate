@@ -29,7 +29,7 @@ public class CrateListener implements Listener {
         String title = e.getView().getTitle();
         Player p = (Player) e.getWhoClicked();
 
-        // FIX CLICK NHẦM TÚI ĐỒ
+        // FIX CLICK TÚI ĐỒ CÁ NHÂN
         if (e.getClickedInventory() == e.getView().getBottomInventory()) {
             if (title.startsWith("Preview: ") || title.startsWith("§8Xác nhận: ")) e.setCancelled(true);
             return;
@@ -46,7 +46,7 @@ public class CrateListener implements Listener {
                 p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
             } else {
                 plugin.sendMsg(p, "no-key", "%crate%", crateName);
-                p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
+                p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f); // Tiếng dân làng lắc đầu
             }
         } 
         else if (title.startsWith("§8Xác nhận: ")) {
@@ -54,16 +54,16 @@ public class CrateListener implements Listener {
             int slot = e.getRawSlot();
             String crateName = title.split(": ")[1].replace("§1", "").trim();
             
-            int cancelSlot = plugin.getConfig().getInt("confirm-gui.cancel.slot", 11);
-            int confirmSlot = plugin.getConfig().getInt("confirm-gui.confirm.slot", 15);
-            int displaySlot = plugin.getConfig().getInt("confirm-gui.item-display.slot", 13);
+            int cancelSlot = plugin.getConfig().getInt("confirm-gui.cancel-slot", 11);
+            int confirmSlot = plugin.getConfig().getInt("confirm-gui.confirm-slot", 15);
+            int displaySlot = plugin.getConfig().getInt("confirm-gui.display-slot", 13);
 
             if (slot == confirmSlot) {
                 ItemStack itemToGive = e.getInventory().getItem(displaySlot);
                 if (itemToGive != null && plugin.getCrateManager().takeKey(p.getName(), crateName)) {
                     p.getInventory().addItem(itemToGive.clone());
                     plugin.sendMsg(p, "open-success", "%crate%", crateName);
-                    p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1.2f);
+                    p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1.2f); // Tiếng thành công
                     p.closeInventory();
                 }
             } else if (slot == cancelSlot) {
@@ -72,4 +72,4 @@ public class CrateListener implements Listener {
             }
         }
     }
-                }
+            }
