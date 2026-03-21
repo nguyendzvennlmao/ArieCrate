@@ -40,4 +40,4 @@ public class CrateManager {
         }
         Bukkit.getGlobalRegionScheduler().execute(plugin, plugin::saveCrateConfig);
     }
-          }
+            }
