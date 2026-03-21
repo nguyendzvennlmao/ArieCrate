@@ -3,26 +3,20 @@ package me.aris.crates;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.Bukkit;
 import java.io.File;
 
 public class ArisCrate extends JavaPlugin {
-    private static ArisCrate instance;
     private CrateManager crateManager;
     private File crateFile, msgFile, keyFile;
     private FileConfiguration crateConfig, msgConfig, keyConfig;
 
     @Override
     public void onEnable() {
-        instance = this;
         saveDefaultConfig();
         loadFiles();
         crateManager = new CrateManager(this);
-        CrateCommand cmd = new CrateCommand(this);
-        getCommand("ariscrate").setExecutor(cmd);
-        getCommand("ariscrate").setTabCompleter(cmd);
+        getCommand("ariscrate").setExecutor(new CrateCommand(this));
         getServer().getPluginManager().registerEvents(new CrateListener(this), this);
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) new CrateExpansion(this).register();
     }
 
     public void loadFiles() {
@@ -40,18 +34,9 @@ public class ArisCrate extends JavaPlugin {
 
     public void sendMsg(org.bukkit.entity.Player p, String path, String... replace) {
         if (!msgConfig.contains("messages." + path)) return;
-        String msg = msgConfig.getString("messages." + path + ".text", path);
+        String msg = crateManager.translateHex(msgConfig.getString("messages." + path + ".text", ""));
         for (int i = 0; i < replace.length; i += 2) msg = msg.replace(replace[i], replace[i+1]);
-        msg = msg.replace("&", "§");
-        if (msgConfig.getBoolean("messages." + path + ".chat", true)) p.sendMessage(msg);
-        if (msgConfig.getBoolean("messages." + path + ".actionbar", false)) {
-            p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR, 
-                new net.md_5.bungee.api.chat.TextComponent(msg));
-        }
-    }
-
-    public String getMessage(String path) {
-        return msgConfig.getString("messages." + path + ".text", path).replace("&", "§");
+        p.sendMessage(msg);
     }
 
     public FileConfiguration getCrateConfig() { return crateConfig; }
