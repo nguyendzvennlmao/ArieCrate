@@ -2,24 +2,11 @@ name: ArisCrate
 version: 1.0
 main: me.aris.crates.ArisCrate
 api-version: '1.20'
-prefix: ArisCrate
-author: Aris
 folia-supported: true
-
+description: Plugin quản lý Crate cho server Folia/Paper.
+author: Aris
 commands:
   ariscrate:
-    description: Lệnh chính quản lý rương ArisCrate.
-    aliases: [ac, crate, arisc]
+    description: Lệnh chính của ArisCrate
+    aliases: [ac, crate]
     permission: ariscrate.admin
-    usage: |
-      &cCách dùng:
-      &e/ac create <tên> &7- Tạo rương tại block đang đứng
-      &e/ac movehere <tên> &7- Dời rương về block đang đứng
-      &e/ac edit <tên> &7- Mở giao diện thêm/sửa vật phẩm
-      &e/ac givekey <tên> <người_chơi> <số_lượng> &7- Cấp chìa khóa
-      &e/ac delete <tên> &7- Xóa rương
-
-permissions:
-  ariscrate.admin:
-    description: Quyền sử dụng tất cả các lệnh của ArisCrate.
-    default: op
