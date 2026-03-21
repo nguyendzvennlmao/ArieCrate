@@ -1,3 +1,15 @@
-# Cấu hình chung cho ArisCrate
-check-update: true
-debug-mode: false
+confirm-gui:
+  title: "&8Xác nhận mở: &1%crate%"
+  rows: 3
+  confirm-item:
+    material: LIME_STAINED_GLASS_PANE
+    name: "&a&lXÁC NHẬN MỞ"
+    lore:
+      - "&7Nhấn để dùng 1 khóa mở &f%crate%&7."
+    slot: 13
+  cancel-item:
+    material: RED_STAINED_GLASS_PANE
+    name: "&c&lHỦY BỎ"
+    lore:
+      - "&7Nhấn để đóng menu."
+    slot: 11
