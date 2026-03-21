@@ -27,7 +27,6 @@ public class ArisCrate extends JavaPlugin {
         getCommand("ariscrate").setExecutor(cmd);
         getCommand("ariscrate").setTabCompleter(cmd);
         getServer().getPluginManager().registerEvents(new CrateListener(this), this);
-        
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new CrateExpansion(this).register();
         }
@@ -39,11 +38,9 @@ public class ArisCrate extends JavaPlugin {
         if (!getDataFolder().exists()) getDataFolder().mkdirs();
         File cratesFolder = new File(getDataFolder(), "crates");
         if (!cratesFolder.exists()) cratesFolder.mkdirs();
-
         msgFile = new File(getDataFolder(), "message.yml");
         if (!msgFile.exists()) saveResource("message.yml", false);
         msgConfig = YamlConfiguration.loadConfiguration(msgFile);
-
         keyFile = new File(getDataFolder(), "playerkey.yml");
         if (!keyFile.exists()) try { keyFile.createNewFile(); } catch (Exception e) {}
         keyConfig = YamlConfiguration.loadConfiguration(keyFile);
@@ -57,13 +54,10 @@ public class ArisCrate extends JavaPlugin {
         if (msgConfig.getBoolean("messages." + path + ".actionbar", false)) {
             p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(msg));
         }
-        if (msgConfig.contains("messages." + path + ".sound")) {
-            p.playSound(p.getLocation(), org.bukkit.Sound.valueOf(msgConfig.getString("messages." + path + ".sound")), 1f, 1f);
-        }
     }
 
     public boolean isFolia() { return isFolia; }
     public FileConfiguration getKeyConfig() { return keyConfig; }
     public void saveKeyConfig() { try { keyConfig.save(keyFile); } catch (Exception e) {} }
     public CrateManager getCrateManager() { return crateManager; }
-                                 }
+            }
