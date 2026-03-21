@@ -1,0 +1,5 @@
+prefix: "&6[&bArisCrate&6] &f"
+create-success: "&aBạn đã tạo crate %crate% thành công!"
+move-success: "&bBạn đã di chuyển %crate% đến %x% %y% %z%"
+delete-success: "&cBạn đã xóa %crate%"
+give-key-success: "&eBạn đã givekey cho %player% (Loại: %crate%, Số lượng: %amount%)"
