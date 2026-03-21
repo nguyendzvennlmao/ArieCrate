@@ -17,6 +17,13 @@ messages:
     text: "&#fc0404⚠ Kho đồ của bạn đã đầy!"
     chat: true
     actionbar: true
+    sound: "ENTITY_VILLAGER_NO"
   reload-success:
     text: "&#04fc04✔ Đã tải lại cấu hình hệ thống thành công!"
     chat: true
+    sound: "UI_BUTTON_CLICK"
+  receive-key:
+    text: "&#facc15✦ Bạn đã nhận được %amount% chìa khóa rương %crate%!"
+    chat: true
+    actionbar: true
+    sound: "ENTITY_PLAYER_LEVELUP"
