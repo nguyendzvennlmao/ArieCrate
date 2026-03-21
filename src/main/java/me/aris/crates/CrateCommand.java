@@ -56,8 +56,7 @@ public class CrateManager {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
                 FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-                // Tự động chuyển tên rương sang Small Caps khi tạo file
-                cfg.set("menu-title", "&#facc15RƯƠNG " + toSmallCaps(crateName.toUpperCase()));
+                cfg.set("menu-title", "&#facc15ʀưᴏ̛ɴɢ " + toSmallCaps(crateName.toUpperCase()));
                 cfg.save(file);
             } catch (Exception e) {}
         }
@@ -81,7 +80,8 @@ public class CrateManager {
     public void openConfirmMenu(Player p, String crateName, ItemStack selectedItem) {
         runTask(p, () -> {
             p.setMetadata("opening_crate", new FixedMetadataValue(plugin, crateName));
-            Inventory inv = Bukkit.createInventory(null, 27, translateHex("&#facc15XÁC NHẬN " + toSmallCaps(crateName.toUpperCase())));
+            String title = translateHex("&#facc15xáᴄ ɴʜậɴ " + toSmallCaps(crateName.toUpperCase()));
+            Inventory inv = Bukkit.createInventory(null, 27, title);
             var cfg = plugin.getConfig();
             inv.setItem(cfg.getInt("confirm-gui.cancel-slot"), createItem(cfg.getString("confirm-gui.cancel.material"), cfg.getString("confirm-gui.cancel.name"), cfg.getStringList("confirm-gui.cancel.lore")));
             inv.setItem(cfg.getInt("confirm-gui.display-slot"), selectedItem);
