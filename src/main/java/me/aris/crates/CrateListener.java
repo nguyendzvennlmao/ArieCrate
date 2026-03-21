@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,12 +25,20 @@ public class CrateListener implements Listener {
     }
 
     @EventHandler
+    public void onEditClose(InventoryCloseEvent e) {
+        if (e.getView().getTitle().startsWith("Editing: ")) {
+            String name = e.getView().getTitle().replace("Editing: ", "");
+            plugin.getCrateManager().saveCrateItems(name, e.getInventory());
+            e.getPlayer().sendMessage("§a[!] Đã lưu phần thưởng cho rương " + name);
+        }
+    }
+
+    @EventHandler
     public void onClick(InventoryClickEvent e) {
         if (e.getClickedInventory() == null) return;
         String title = e.getView().getTitle();
         Player p = (Player) e.getWhoClicked();
 
-        // FIX CLICK NHẦM TÚI ĐỒ
         if (e.getClickedInventory() == e.getView().getBottomInventory()) {
             if (title.startsWith("Preview: ") || title.startsWith("§8Xác nhận: ")) e.setCancelled(true);
             return;
@@ -54,9 +63,9 @@ public class CrateListener implements Listener {
             int slot = e.getRawSlot();
             String crateName = title.split(": ")[1].replace("§1", "").trim();
             
-            int cancelSlot = plugin.getConfig().getInt("confirm-gui.cancel.slot", 11);
-            int confirmSlot = plugin.getConfig().getInt("confirm-gui.confirm.slot", 15);
-            int displaySlot = plugin.getConfig().getInt("confirm-gui.item-display.slot", 13);
+            int cancelSlot = plugin.getConfig().getInt("confirm-gui.cancel-slot", 11);
+            int confirmSlot = plugin.getConfig().getInt("confirm-gui.confirm-slot", 15);
+            int displaySlot = plugin.getConfig().getInt("confirm-gui.display-slot", 13);
 
             if (slot == confirmSlot) {
                 ItemStack itemToGive = e.getInventory().getItem(displaySlot);
@@ -72,4 +81,4 @@ public class CrateListener implements Listener {
             }
         }
     }
-                    }
+    }
