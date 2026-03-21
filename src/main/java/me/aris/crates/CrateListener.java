@@ -55,4 +55,4 @@ public class CrateListener implements Listener {
             e.getPlayer().sendMessage("§a[ArisCrate] Đã lưu phần thưởng rương!");
         }
     }
-                }
+}
