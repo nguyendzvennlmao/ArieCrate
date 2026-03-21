@@ -36,8 +36,6 @@ public class ArisCrate extends JavaPlugin {
         saveDefaultConfig();
         reloadConfig();
         if (!getDataFolder().exists()) getDataFolder().mkdirs();
-        File cratesFolder = new File(getDataFolder(), "crates");
-        if (!cratesFolder.exists()) cratesFolder.mkdirs();
         msgFile = new File(getDataFolder(), "message.yml");
         if (!msgFile.exists()) saveResource("message.yml", false);
         msgConfig = YamlConfiguration.loadConfiguration(msgFile);
@@ -58,6 +56,7 @@ public class ArisCrate extends JavaPlugin {
 
     public boolean isFolia() { return isFolia; }
     public FileConfiguration getKeyConfig() { return keyConfig; }
+    public FileConfiguration getMsgConfig() { return msgConfig; }
     public void saveKeyConfig() { try { keyConfig.save(keyFile); } catch (Exception e) {} }
     public CrateManager getCrateManager() { return crateManager; }
             }
