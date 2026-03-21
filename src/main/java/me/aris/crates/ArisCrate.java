@@ -3,6 +3,7 @@ package me.aris.crates;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.Bukkit;
 import java.io.File;
 
 public class ArisCrate extends JavaPlugin {
@@ -21,6 +22,10 @@ public class ArisCrate extends JavaPlugin {
         getCommand("ariscrate").setExecutor(cmd);
         getCommand("ariscrate").setTabCompleter(cmd);
         getServer().getPluginManager().registerEvents(new CrateListener(this), this);
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new CrateExpansion(this).register();
+        }
     }
 
     public void loadFiles() {
@@ -42,7 +47,7 @@ public class ArisCrate extends JavaPlugin {
         try { crateConfig.save(crateFile); } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public static ArisCrate getInstance() { return instance; }
-    public CrateManager getCrateManager() { return crateManager; }
-    public FileConfiguration getCrateConfig() { return crateConfig; }
-            }
+    public static ArisCrate instance() { return instance; }
+    public CrateManager crateManager() { return crateManager; }
+    public FileConfiguration crateConfig() { return crateConfig; }
+}
