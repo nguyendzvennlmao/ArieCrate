@@ -1,5 +1,9 @@
-prefix: "&6[&bArisCrate&6] &f"
-give-key-success: "&aĐã đưa &e%amount% &achìa khóa &f%crate% &acho người chơi &e%player%&a."
-delete-success: "&cĐã xóa rương &f%crate% &cthành công."
-no-key: "&cBạn không có chìa khóa để mở rương này!"
-reload: "&aĐã tải lại cấu hình thành công."
+messages:
+  no-key:
+    text: "&c[!] Bạn không có chìa khóa rương %crate%!"
+    chat: true
+    actionbar: true
+  open-success:
+    text: "&a[!] Bạn đã mở rương %crate% thành công!"
+    chat: true
+    actionbar: false
