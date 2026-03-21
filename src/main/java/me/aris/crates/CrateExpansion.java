@@ -17,15 +17,16 @@ public class CrateExpansion extends PlaceholderExpansion {
     @Override
     public String onPlaceholderRequest(Player player, @NotNull String params) {
         if (player == null) return "0";
-        String keyName = plugin.crateConfig().getString("crates." + params + ".key.name");
+        String keyName = plugin.getCrateConfig().getString("crates." + params + ".key.name");
         if (keyName == null) return "0";
         String coloredKey = keyName.replace("&", "§");
         int count = 0;
         for (ItemStack item : player.getInventory().getContents()) {
-            if (item != null && item.hasItemMeta() && item.getItemMeta().getDisplayName().equals(coloredKey)) {
+            if (item != null && item.hasItemMeta() && 
+                item.getItemMeta().getDisplayName().equals(coloredKey)) {
                 count += item.getAmount();
             }
         }
         return String.valueOf(count);
     }
-}
+             }
