@@ -18,6 +18,7 @@ public class ArisCrate extends JavaPlugin {
         saveDefaultConfig();
         loadFiles();
         crateManager = new CrateManager(this);
+        
         CrateCommand cmd = new CrateCommand(this);
         getCommand("ariscrate").setExecutor(cmd);
         getCommand("ariscrate").setTabCompleter(cmd);
@@ -33,6 +34,7 @@ public class ArisCrate extends JavaPlugin {
         crateFile = new File(getDataFolder(), "crate.yml");
         if (!crateFile.exists()) saveResource("crate.yml", false);
         crateConfig = YamlConfiguration.loadConfiguration(crateFile);
+        
         msgFile = new File(getDataFolder(), "message.yml");
         if (!msgFile.exists()) saveResource("message.yml", false);
         msgConfig = YamlConfiguration.loadConfiguration(msgFile);
@@ -47,7 +49,7 @@ public class ArisCrate extends JavaPlugin {
         try { crateConfig.save(crateFile); } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public static ArisCrate instance() { return instance; }
-    public CrateManager crateManager() { return crateManager; }
-    public FileConfiguration crateConfig() { return crateConfig; }
-}
+    public static ArisCrate getInstance() { return instance; }
+    public CrateManager getCrateManager() { return crateManager; }
+    public FileConfiguration getCrateConfig() { return crateConfig; }
+            }
