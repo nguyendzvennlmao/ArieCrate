@@ -18,55 +18,42 @@ public class ArisCrate extends JavaPlugin {
         saveDefaultConfig();
         loadFiles();
         crateManager = new CrateManager(this);
-        
         CrateCommand cmd = new CrateCommand(this);
         getCommand("ariscrate").setExecutor(cmd);
         getCommand("ariscrate").setTabCompleter(cmd);
         getServer().getPluginManager().registerEvents(new CrateListener(this), this);
-
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new CrateExpansion(this).register();
-        }
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) new CrateExpansion(this).register();
     }
 
     public void loadFiles() {
         if (!getDataFolder().exists()) getDataFolder().mkdirs();
-        
         crateFile = new File(getDataFolder(), "crate.yml");
         if (!crateFile.exists()) saveResource("crate.yml", false);
         crateConfig = YamlConfiguration.loadConfiguration(crateFile);
-        
         msgFile = new File(getDataFolder(), "message.yml");
         if (!msgFile.exists()) saveResource("message.yml", false);
         msgConfig = YamlConfiguration.loadConfiguration(msgFile);
-
         keyFile = new File(getDataFolder(), "playerkey.yml");
-        if (!keyFile.exists()) {
-            try { keyFile.createNewFile(); } catch (Exception e) { e.printStackTrace(); }
-        }
+        if (!keyFile.exists()) try { keyFile.createNewFile(); } catch (Exception e) {}
         keyConfig = YamlConfiguration.loadConfiguration(keyFile);
     }
 
     public void sendMsg(org.bukkit.entity.Player p, String path, String... replace) {
-        if (!msgConfig.contains("messages." + path)) return;
-        String msg = msgConfig.getString("messages." + path + ".text", "");
-        for (int i = 0; i < replace.length; i += 2) {
-            msg = msg.replace(replace[i], replace[i+1]);
-        }
+        String msg = msgConfig.getString("messages." + path + ".text", path);
+        for (int i = 0; i < replace.length; i += 2) msg = msg.replace(replace[i], replace[i+1]);
         msg = msg.replace("&", "§");
-        
         if (msgConfig.getBoolean("messages." + path + ".chat", true)) p.sendMessage(msg);
-        if (msgConfig.getBoolean("messages." + path + ".actionbar", false)) {
-            p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR, 
-                new net.md_5.bungee.api.chat.TextComponent(msg));
-        }
+        if (msgConfig.getBoolean("messages." + path + ".actionbar", false)) 
+            p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR, new net.md_5.api.chat.TextComponent(msg));
     }
 
-    public void saveCrateConfig() { try { crateConfig.save(crateFile); } catch (Exception e) {} }
-    public void saveKeyConfig() { try { keyConfig.save(keyFile); } catch (Exception e) {} }
-    
-    public static ArisCrate getInstance() { return instance; }
-    public CrateManager getCrateManager() { return crateManager; }
+    public String getMessage(String path) {
+        return msgConfig.getString("messages." + path + ".text", path).replace("&", "§");
+    }
+
     public FileConfiguration getCrateConfig() { return crateConfig; }
     public FileConfiguration getKeyConfig() { return keyConfig; }
-            }
+    public void saveCrateConfig() { try { crateConfig.save(crateFile); } catch (Exception e) {} }
+    public void saveKeyConfig() { try { keyConfig.save(keyFile); } catch (Exception e) {} }
+    public CrateManager getCrateManager() { return crateManager; }
+        }
