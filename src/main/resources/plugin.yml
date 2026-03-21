@@ -3,10 +3,7 @@ version: 1.0
 main: me.aris.crates.ArisCrate
 api-version: '1.20'
 folia-supported: true
-description: Plugin quản lý Crate cho server Folia/Paper.
-author: Aris
 commands:
   ariscrate:
-    description: Lệnh chính của ArisCrate
-    aliases: [ac, crate]
+    aliases: [ac]
     permission: ariscrate.admin
