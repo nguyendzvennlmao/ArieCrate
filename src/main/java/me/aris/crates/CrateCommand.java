@@ -2,157 +2,64 @@ package me.aris.crates;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
-import net.md_5.bungee.api.ChatColor;
 import java.io.File;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-public class CrateManager {
+public class CrateCommand implements CommandExecutor, TabCompleter {
     private final ArisCrate plugin;
-    private final Pattern hexPattern = Pattern.compile("&#([A-Fa-f0-9]{6})");
+    public CrateCommand(ArisCrate plugin) { this.plugin = plugin; }
 
-    public CrateManager(ArisCrate plugin) { this.plugin = plugin; }
-
-    public String toSmallCaps(String input) {
-        String normal = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        String small = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢ₀₁₂₃₄₅₆₇₈₉";
-        StringBuilder sb = new StringBuilder();
-        for (char c : input.toCharArray()) {
-            int index = normal.indexOf(c);
-            if (index != -1) sb.append(small.charAt(index));
-            else sb.append(c);
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length == 0) return true;
+        String sub = args[0].toLowerCase();
+        if (sub.equals("reload")) {
+            plugin.loadFiles();
+            if (sender instanceof Player) plugin.sendMsg((Player) sender, "reload-success");
+            else sender.sendMessage("✔ Reloaded successfully!");
+            return true;
         }
-        return sb.toString();
-    }
-
-    public String translateHex(String msg) {
-        if (msg == null) return "";
-        Matcher matcher = hexPattern.matcher(msg);
-        StringBuilder buffer = new StringBuilder();
-        while (matcher.find()) {
-            matcher.appendReplacement(buffer, ChatColor.of("#" + matcher.group(1)).toString());
-        }
-        return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
-    }
-
-    private void runTask(Player p, Runnable r) {
-        if (plugin.isFolia()) p.getScheduler().execute(plugin, r, null, 1L);
-        else r.run();
-    }
-
-    public FileConfiguration getCrateConfig(String crateName) {
-        File file = new File(plugin.getDataFolder() + "/crates", crateName + ".yml");
-        if (!file.exists()) {
-            try {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-                FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-                cfg.set("menu-title", "&#facc15ʀưᴏ̛ɴɢ " + toSmallCaps(crateName.toUpperCase()));
-                cfg.save(file);
-            } catch (Exception e) {}
-        }
-        return YamlConfiguration.loadConfiguration(file);
-    }
-
-    public void openPreview(Player p, String c) {
-        runTask(p, () -> {
-            FileConfiguration cfg = getCrateConfig(c);
-            String title = translateHex(cfg.getString("menu-title", "Xem rương: " + c));
-            Inventory inv = Bukkit.createInventory(null, 27, title);
-            if (cfg.contains("rewards")) {
-                for (String key : cfg.getConfigurationSection("rewards").getKeys(false)) {
-                    inv.setItem(Integer.parseInt(key), cfg.getItemStack("rewards." + key));
-                }
+        if (sender instanceof Player) {
+            Player p = (Player) sender;
+            if (sub.equals("create") || sub.equals("movehere")) {
+                if (args.length < 2) return true;
+                String name = args[1];
+                Location loc = p.getLocation();
+                var cfg = plugin.getCrateManager().getCrateConfig(name);
+                cfg.set("location.world", loc.getWorld().getName());
+                cfg.set("location.x", loc.getBlockX());
+                cfg.set("location.y", loc.getBlockY());
+                cfg.set("location.z", loc.getBlockZ());
+                try { cfg.save(new File(plugin.getDataFolder() + "/crates", name + ".yml")); } catch (Exception e) {}
+                plugin.sendMsg(p, "crate-create", "%crate%", name);
+                return true;
             }
-            p.openInventory(inv);
-        });
-    }
-
-    public void openConfirmMenu(Player p, String crateName, ItemStack selectedItem) {
-        runTask(p, () -> {
-            p.setMetadata("opening_crate", new FixedMetadataValue(plugin, crateName));
-            String title = translateHex("&#facc15xáᴄ ɴʜậɴ " + toSmallCaps(crateName.toUpperCase()));
-            Inventory inv = Bukkit.createInventory(null, 27, title);
-            var cfg = plugin.getConfig();
-            inv.setItem(cfg.getInt("confirm-gui.cancel-slot"), createItem(cfg.getString("confirm-gui.cancel.material"), cfg.getString("confirm-gui.cancel.name"), cfg.getStringList("confirm-gui.cancel.lore")));
-            inv.setItem(cfg.getInt("confirm-gui.display-slot"), selectedItem);
-            inv.setItem(cfg.getInt("confirm-gui.confirm-slot"), createItem(cfg.getString("confirm-gui.confirm.material"), cfg.getString("confirm-gui.confirm.name"), cfg.getStringList("confirm-gui.confirm.lore")));
-            p.openInventory(inv);
-        });
-    }
-
-    public void openEditMenu(Player p, String name) {
-        runTask(p, () -> {
-            Inventory inv = Bukkit.createInventory(null, 27, "Editing: " + name);
-            FileConfiguration cfg = getCrateConfig(name);
-            if (cfg.contains("rewards")) {
-                for (String key : cfg.getConfigurationSection("rewards").getKeys(false)) {
-                    inv.setItem(Integer.parseInt(key), cfg.getItemStack("rewards." + key));
-                }
-            }
-            p.openInventory(inv);
-        });
-    }
-
-    public void saveCrateItems(String name, Inventory inv) {
-        FileConfiguration cfg = getCrateConfig(name);
-        cfg.set("rewards", null);
-        for (int i = 0; i < inv.getSize(); i++) {
-            if (inv.getItem(i) != null) cfg.set("rewards." + i, inv.getItem(i).clone());
+            if (sub.equals("edit") && args.length > 1) { plugin.getCrateManager().openEditMenu(p, args[1]); return true; }
         }
-        try { cfg.save(new File(plugin.getDataFolder() + "/crates", name + ".yml")); } catch (Exception e) {}
-    }
-
-    public String getCrateAt(Location loc) {
-        File folder = new File(plugin.getDataFolder(), "crates");
-        if (!folder.exists() || folder.listFiles() == null) return null;
-        for (File file : folder.listFiles()) {
-            if (!file.getName().endsWith(".yml")) continue;
-            FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-            if (cfg.contains("location") && 
-                cfg.getString("location.world", "").equals(loc.getWorld().getName()) &&
-                cfg.getInt("location.x") == loc.getBlockX() &&
-                cfg.getInt("location.y") == loc.getBlockY() &&
-                cfg.getInt("location.z") == loc.getBlockZ()) {
-                return file.getName().replace(".yml", "");
-            }
+        if (sub.equals("givekey") && args.length > 3) {
+            Player target = Bukkit.getPlayer(args[1]);
+            if (target != null) plugin.getCrateManager().giveKey(target, args[2], Integer.parseInt(args[3]));
         }
-        return null;
-    }
-
-    private ItemStack createItem(String mat, String name, List<String> lore) {
-        ItemStack item = new ItemStack(Material.valueOf(mat));
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(translateHex(name));
-            List<String> l = new ArrayList<>();
-            for (String s : lore) l.add(translateHex(s));
-            meta.setLore(l);
-            item.setItemMeta(meta);
-        }
-        return item;
-    }
-
-    public void giveKey(Player target, String crateName, int amount) {
-        int current = plugin.getKeyConfig().getInt(target.getName() + "." + crateName, 0);
-        plugin.getKeyConfig().set(target.getName() + "." + crateName, current + amount);
-        plugin.saveKeyConfig();
-    }
-
-    public boolean takeKey(String p, String c) {
-        int cur = plugin.getKeyConfig().getInt(p + "." + c, 0);
-        if (cur <= 0) return false;
-        plugin.getKeyConfig().set(p + "." + c, cur - 1);
-        plugin.saveKeyConfig();
         return true;
     }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length == 1) return Arrays.asList("create", "movehere", "edit", "givekey", "reload").stream().filter(s -> s.startsWith(args[0].toLowerCase())).collect(Collectors.toList());
+        List<String> crates = new ArrayList<>();
+        File folder = new File(plugin.getDataFolder(), "crates");
+        if (folder.exists() && folder.listFiles() != null) {
+            for (File f : folder.listFiles()) if (f.getName().endsWith(".yml")) crates.add(f.getName().replace(".yml", ""));
+        }
+        if (args[0].equalsIgnoreCase("givekey")) {
+            if (args.length == 2) return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(n -> n.toLowerCase().startsWith(args[1].toLowerCase())).collect(Collectors.toList());
+            if (args.length == 3) return crates.stream().filter(c -> c.toLowerCase().startsWith(args[2].toLowerCase())).collect(Collectors.toList());
+            if (args.length == 4) return Collections.singletonList("1");
+        }
+        if (args.length == 2 && (args[0].equalsIgnoreCase("edit") || args[0].equalsIgnoreCase("movehere") || args[0].equalsIgnoreCase("create"))) return crates.stream().filter(c -> c.toLowerCase().startsWith(args[1].toLowerCase())).collect(Collectors.toList());
+        return new ArrayList<>();
     }
+                }
