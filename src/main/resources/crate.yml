@@ -1,0 +1,33 @@
+# Dữ liệu các Crate
+crates:
+  common:
+    display-name: "&aᴄᴏᴍᴍᴏɴ ᴄʀᴀᴛᴇ"
+    rows: 3
+    key:
+      name: "&7ᴋᴇʏ ᴀʟʟ ᴋᴇʏ"
+      material: TRIPWIRE_HOOK
+    # Các item thưởng sẽ tự động sinh ra ở đây khi bạn dùng lệnh /ac edit
+    rewards:
+      10:
+        ==: org.bukkit.inventory.ItemStack
+        v: 3465
+        type: DIAMOND_SWORD
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: "§bKiếm Tân Thủ"
+          enchants:
+            SHARPNESS: 1
+      13:
+        ==: org.bukkit.inventory.ItemStack
+        v: 3465
+        type: GOLDEN_APPLE
+        amount: 5
+
+  gold:
+    display-name: "&6ɢᴏʟᴅ ᴄʀᴀᴛᴇ"
+    rows: 3
+    key:
+      name: "&6ɢᴏʟᴅ ᴋᴇʏ"
+      material: GOLD_NUGGET
+    rewards: {}
