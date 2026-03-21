@@ -22,6 +22,18 @@ public class CrateManager {
 
     public CrateManager(ArisCrate plugin) { this.plugin = plugin; }
 
+    public String toSmallCaps(String input) {
+        String normal = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        String small = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢ₀₁₂₃₄₅₆₇₈₉";
+        StringBuilder sb = new StringBuilder();
+        for (char c : input.toCharArray()) {
+            int index = normal.indexOf(c);
+            if (index != -1) sb.append(small.charAt(index));
+            else sb.append(c);
+        }
+        return sb.toString();
+    }
+
     public String translateHex(String msg) {
         if (msg == null) return "";
         Matcher matcher = hexPattern.matcher(msg);
@@ -44,7 +56,7 @@ public class CrateManager {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
                 FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-                cfg.set("menu-title", "&#facc15Rương " + crateName);
+                cfg.set("menu-title", "&#facc15ʀưᴏ̛ɴɢ " + toSmallCaps(crateName.toUpperCase()));
                 cfg.save(file);
             } catch (Exception e) {}
         }
@@ -68,7 +80,8 @@ public class CrateManager {
     public void openConfirmMenu(Player p, String crateName, ItemStack selectedItem) {
         runTask(p, () -> {
             p.setMetadata("opening_crate", new FixedMetadataValue(plugin, crateName));
-            Inventory inv = Bukkit.createInventory(null, 27, translateHex("&#facc15Xác nhận: " + crateName));
+            String title = translateHex("&#facc15xáᴄ ɴʜậɴ " + toSmallCaps(crateName.toUpperCase()));
+            Inventory inv = Bukkit.createInventory(null, 27, title);
             var cfg = plugin.getConfig();
             inv.setItem(cfg.getInt("confirm-gui.cancel-slot"), createItem(cfg.getString("confirm-gui.cancel.material"), cfg.getString("confirm-gui.cancel.name"), cfg.getStringList("confirm-gui.cancel.lore")));
             inv.setItem(cfg.getInt("confirm-gui.display-slot"), selectedItem);
@@ -142,4 +155,4 @@ public class CrateManager {
         plugin.saveKeyConfig();
         return true;
     }
-                                                      }
+                }
