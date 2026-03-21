@@ -72,4 +72,4 @@ public class CrateCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) return Arrays.asList("create", "delete", "movehere", "edit", "givekey", "reload");
         return null;
     }
-}
+        }
