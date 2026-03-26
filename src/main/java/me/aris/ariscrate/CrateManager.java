@@ -45,29 +45,32 @@ public class CrateManager {
     public void openPreview(Player p, String c) {
         runTask(p, () -> {
             FileConfiguration cfg = getCrateConfig(c);
-            String title = translateHex(cfg.getString("menu-title", "&#facc15ʀưᴏ̛ɴɢ " + c.toUpperCase()));
-            Inventory inv = Bukkit.createInventory(null, 27, title);
+            String title = translateHex(cfg.getString("display-name", "&#facc15ʀưᴏ̛ɴɢ " + c.toUpperCase()));
+            int rows = cfg.getInt("rows", 3) * 9;
+            Inventory inv = Bukkit.createInventory(null, rows, title);
             if (cfg.contains("rewards")) {
                 for (String key : cfg.getConfigurationSection("rewards").getKeys(false)) {
                     inv.setItem(Integer.parseInt(key), cfg.getItemStack("rewards." + key));
                 }
             }
             p.openInventory(inv);
+            p.setMetadata("current_viewing_crate", new FixedMetadataValue(plugin, c));
             playSound(p, "open-preview");
         });
     }
 
     public void openEditMenu(Player p, String name) {
         runTask(p, () -> {
-            Inventory inv = Bukkit.createInventory(null, 27, "Editing: " + name);
             FileConfiguration cfg = getCrateConfig(name);
+            int rows = cfg.getInt("rows", 3) * 9;
+            Inventory inv = Bukkit.createInventory(null, rows, "Editing: " + name);
             if (cfg.contains("rewards")) {
                 for (String key : cfg.getConfigurationSection("rewards").getKeys(false)) {
                     inv.setItem(Integer.parseInt(key), cfg.getItemStack("rewards." + key));
                 }
             }
-            p.openInventory(inv);
             p.setMetadata("editing_crate_name", new FixedMetadataValue(plugin, name));
+            p.openInventory(inv);
         });
     }
 
@@ -97,7 +100,15 @@ public class CrateManager {
 
     public FileConfiguration getCrateConfig(String crateName) {
         File file = new File(plugin.getDataFolder() + "/crates", crateName + ".yml");
-        if (!file.exists()) try { file.createNewFile(); } catch (Exception e) {}
+        if (!file.exists()) {
+            try { 
+                file.createNewFile();
+                FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+                cfg.set("display-name", "&#facc15ʀưᴏ̛ɴɢ " + crateName.toUpperCase());
+                cfg.set("rows", 3);
+                cfg.save(file);
+            } catch (Exception e) {}
+        }
         return YamlConfiguration.loadConfiguration(file);
     }
 
@@ -146,4 +157,4 @@ public class CrateManager {
         plugin.saveKeyConfig();
         return true;
     }
-                                                                              }
+                        }
