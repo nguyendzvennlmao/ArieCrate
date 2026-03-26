@@ -16,6 +16,11 @@ public class CrateListener implements Listener {
         if (e.getClickedInventory() == null) return;
         String title = e.getView().getTitle();
         Player p = (Player) e.getWhoClicked();
+
+        if (title.startsWith("Editing: ")) {
+            return;
+        }
+
         if (title.contains("ʀưᴏ̛ɴɢ") || title.contains("RƯƠNG")) {
             e.setCancelled(true);
             if (e.getClickedInventory() == e.getView().getBottomInventory()) return;
