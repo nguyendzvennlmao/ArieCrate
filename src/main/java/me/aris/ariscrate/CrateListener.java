@@ -85,4 +85,4 @@ public class CrateListener implements Listener {
         e.getPlayer().setMetadata("current_viewing_crate", new FixedMetadataValue(plugin, name));
         plugin.getCrateManager().openPreview(e.getPlayer(), name); 
     }
-            }
+        }
