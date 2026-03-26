@@ -1,0 +1,13 @@
+name: ArisCrate
+version: 1.1
+author: VennLMAO
+main: me.aris.ariscrate.ArisCrate
+api-version: 1.20
+folia-supported: true
+commands:
+  ariscrate:
+    aliases: [ac]
+    permission: ariscrate.admin
+permissions:
+  ariscrate.admin:
+    default: op
