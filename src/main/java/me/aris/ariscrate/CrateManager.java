@@ -57,6 +57,20 @@ public class CrateManager {
         });
     }
 
+    public void openEditMenu(Player p, String name) {
+        runTask(p, () -> {
+            Inventory inv = Bukkit.createInventory(null, 27, "Editing: " + name);
+            FileConfiguration cfg = getCrateConfig(name);
+            if (cfg.contains("rewards")) {
+                for (String key : cfg.getConfigurationSection("rewards").getKeys(false)) {
+                    inv.setItem(Integer.parseInt(key), cfg.getItemStack("rewards." + key));
+                }
+            }
+            p.openInventory(inv);
+            p.setMetadata("editing_crate_name", new FixedMetadataValue(plugin, name));
+        });
+    }
+
     public void openConfirmMenu(Player p, String crateName, ItemStack selectedItem) {
         runTask(p, () -> {
             p.setMetadata("opening_crate", new FixedMetadataValue(plugin, crateName));
@@ -132,4 +146,4 @@ public class CrateManager {
         plugin.saveKeyConfig();
         return true;
     }
-              }
+                                                                              }
