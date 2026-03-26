@@ -11,7 +11,7 @@ public class CrateListener implements Listener {
     private final ArisCrate plugin;
     public CrateListener(ArisCrate plugin) { this.plugin = plugin; }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent e) {
         if (e.getClickedInventory() == null) return;
         String title = e.getView().getTitle();
@@ -21,12 +21,11 @@ public class CrateListener implements Listener {
             return;
         }
 
-        if (title.contains("ʀưᴏ̛ɴɢ") || title.contains("RƯƠNG")) {
+        if (p.hasMetadata("current_viewing_crate") && !title.startsWith("xáᴄ ɴʜậɴ")) {
             e.setCancelled(true);
             if (e.getClickedInventory() == e.getView().getBottomInventory()) return;
             ItemStack item = e.getCurrentItem();
             if (item == null || item.getType().isAir()) return;
-            if (!p.hasMetadata("current_viewing_crate")) return;
             String crateName = p.getMetadata("current_viewing_crate").get(0).asString();
             int keys = plugin.getKeyConfig().getInt(p.getName() + "." + crateName, 0);
             if (keys <= 0) {
@@ -36,7 +35,10 @@ public class CrateListener implements Listener {
                 return;
             }
             plugin.getCrateManager().openConfirmMenu(p, crateName, item);
-        } else if (title.contains("xáᴄ ɴʜậɴ") || title.contains("XÁC NHẬN")) {
+            return;
+        }
+
+        if (title.contains("xáᴄ ɴʜậɴ") || title.contains("XÁC NHẬN")) {
             e.setCancelled(true);
             int slot = e.getRawSlot();
             if (!p.hasMetadata("opening_crate")) return;
@@ -74,6 +76,8 @@ public class CrateListener implements Listener {
                 p.removeMetadata("editing_crate_name", plugin);
             }
         }
+        p.removeMetadata("current_viewing_crate", plugin);
+        p.removeMetadata("opening_crate", plugin);
     }
 
     @EventHandler
@@ -82,7 +86,6 @@ public class CrateListener implements Listener {
         String name = plugin.getCrateManager().getCrateAt(e.getClickedBlock().getLocation());
         if (name == null) return;
         e.setCancelled(true); 
-        e.getPlayer().setMetadata("current_viewing_crate", new FixedMetadataValue(plugin, name));
         plugin.getCrateManager().openPreview(e.getPlayer(), name); 
     }
-        }
+            }
