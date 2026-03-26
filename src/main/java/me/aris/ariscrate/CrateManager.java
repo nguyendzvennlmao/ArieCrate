@@ -1,0 +1,135 @@
+package me.aris.ariscrate;
+
+import org.bukkit.*;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
+import net.md_5.bungee.api.ChatColor;
+import java.io.File;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class CrateManager {
+    private final ArisCrate plugin;
+    private final Pattern hexPattern = Pattern.compile("&#([A-Fa-f0-9]{6})");
+
+    public CrateManager(ArisCrate plugin) { this.plugin = plugin; }
+
+    public String translateHex(String msg) {
+        if (msg == null) return "";
+        Matcher matcher = hexPattern.matcher(msg);
+        StringBuilder buffer = new StringBuilder();
+        while (matcher.find()) {
+            matcher.appendReplacement(buffer, ChatColor.of("#" + matcher.group(1)).toString());
+        }
+        return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
+    }
+
+    public void playSound(Player p, String path) {
+        String soundName = plugin.getConfig().getString("sounds." + path);
+        if (soundName != null) {
+            p.playSound(p.getLocation(), Sound.valueOf(soundName), 1f, 1f);
+        }
+    }
+
+    public void runTask(Player p, Runnable r) {
+        if (plugin.isFolia()) p.getScheduler().execute(plugin, r, null, 1L);
+        else r.run();
+    }
+
+    public void openPreview(Player p, String c) {
+        runTask(p, () -> {
+            FileConfiguration cfg = getCrateConfig(c);
+            String title = translateHex(cfg.getString("menu-title", "&#facc15ʀưᴏ̛ɴɢ " + c.toUpperCase()));
+            Inventory inv = Bukkit.createInventory(null, 27, title);
+            if (cfg.contains("rewards")) {
+                for (String key : cfg.getConfigurationSection("rewards").getKeys(false)) {
+                    inv.setItem(Integer.parseInt(key), cfg.getItemStack("rewards." + key));
+                }
+            }
+            p.openInventory(inv);
+            playSound(p, "open-preview");
+        });
+    }
+
+    public void openConfirmMenu(Player p, String crateName, ItemStack selectedItem) {
+        runTask(p, () -> {
+            p.setMetadata("opening_crate", new FixedMetadataValue(plugin, crateName));
+            String title = translateHex("&#facc15xáᴄ ɴʜậɴ " + crateName.toUpperCase());
+            Inventory inv = Bukkit.createInventory(null, 27, title);
+            var cfg = plugin.getConfig();
+            inv.setItem(cfg.getInt("confirm-gui.cancel-slot"), createItem(cfg.getString("confirm-gui.cancel.material"), cfg.getString("confirm-gui.cancel.name"), cfg.getStringList("confirm-gui.cancel.lore")));
+            inv.setItem(cfg.getInt("confirm-gui.display-slot"), selectedItem.clone());
+            inv.setItem(cfg.getInt("confirm-gui.confirm-slot"), createItem(cfg.getString("confirm-gui.confirm.material"), cfg.getString("confirm-gui.confirm.name"), cfg.getStringList("confirm-gui.confirm.lore")));
+            p.openInventory(inv);
+            playSound(p, "confirm-click");
+        });
+    }
+
+    public void saveCrateItems(String name, Inventory inv) {
+        FileConfiguration cfg = getCrateConfig(name);
+        cfg.set("rewards", null);
+        for (int i = 0; i < inv.getSize(); i++) {
+            ItemStack item = inv.getItem(i);
+            if (item != null && item.getType() != Material.AIR) cfg.set("rewards." + i, item);
+        }
+        try { cfg.save(new File(plugin.getDataFolder() + "/crates", name + ".yml")); } catch (Exception e) {}
+    }
+
+    public FileConfiguration getCrateConfig(String crateName) {
+        File file = new File(plugin.getDataFolder() + "/crates", crateName + ".yml");
+        if (!file.exists()) try { file.createNewFile(); } catch (Exception e) {}
+        return YamlConfiguration.loadConfiguration(file);
+    }
+
+    public String getCrateAt(Location loc) {
+        File folder = new File(plugin.getDataFolder(), "crates");
+        if (!folder.exists() || folder.listFiles() == null) return null;
+        for (File file : folder.listFiles()) {
+            FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+            if (cfg.contains("location") && 
+                cfg.getString("location.world", "").equals(loc.getWorld().getName()) &&
+                cfg.getInt("location.x") == loc.getBlockX() &&
+                cfg.getInt("location.y") == loc.getBlockY() &&
+                cfg.getInt("location.z") == loc.getBlockZ()) {
+                return file.getName().replace(".yml", "");
+            }
+        }
+        return null;
+    }
+
+    private ItemStack createItem(String mat, String name, List<String> lore) {
+        ItemStack item = new ItemStack(Material.valueOf(mat));
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(translateHex(name));
+            List<String> l = new ArrayList<>();
+            for (String s : lore) l.add(translateHex(s));
+            meta.setLore(l);
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    public void giveKey(Player target, String crateName, int amount) {
+        String path = target.getName() + "." + crateName;
+        int current = plugin.getKeyConfig().getInt(path, 0);
+        plugin.getKeyConfig().set(path, current + amount);
+        plugin.saveKeyConfig();
+        plugin.sendMsg(target, "receive-key", "%amount%", String.valueOf(amount), "%crate%", crateName);
+        playSound(target, "receive-key");
+    }
+
+    public boolean takeKey(String p, String c) {
+        int cur = plugin.getKeyConfig().getInt(p + "." + c, 0);
+        if (cur <= 0) return false;
+        plugin.getKeyConfig().set(p + "." + c, cur - 1);
+        plugin.saveKeyConfig();
+        return true;
+    }
+              }
