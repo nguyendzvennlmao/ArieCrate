@@ -61,4 +61,4 @@ public class ArisCrate extends JavaPlugin {
     public FileConfiguration getMsgConfig() { return msgConfig; }
     public void saveKeyConfig() { try { keyConfig.save(keyFile); } catch (Exception e) {} }
     public CrateManager getCrateManager() { return crateManager; }
-          }
+            }
