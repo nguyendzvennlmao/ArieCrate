@@ -7,9 +7,9 @@ sounds:
   no-key: ENTITY_VILLAGER_NO
 
 confirm-gui:
-  cancel-slot: 10
+  cancel-slot: 11
   display-slot: 13
-  confirm-slot: 16
+  confirm-slot: 15
   cancel:
     material: RED_STAINED_GLASS_PANE
     name: "&#ff0812ʜủʏ ʙỏ"
@@ -17,6 +17,6 @@ confirm-gui:
       - "&fClick để đóng menu"
   confirm:
     material: LIME_STAINED_GLASS_PANE
-    name: "&#facc15xáᴄ ɴʜậɴ ᴍở"
+    name: "&#facc15xáᴄ ɴʜậɴ"
     lore:
       - "&fClick để dùng 1 chìa khóa"
