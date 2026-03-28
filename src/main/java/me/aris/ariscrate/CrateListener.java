@@ -17,11 +17,9 @@ public class CrateListener implements Listener {
         String title = e.getView().getTitle();
         Player p = (Player) e.getWhoClicked();
 
-        if (title.startsWith("Editing: ")) {
-            return;
-        }
+        if (title.startsWith("Editing: ")) return;
 
-        if (p.hasMetadata("current_viewing_crate") && !title.startsWith("xáᴄ ɴʜậɴ")) {
+        if (p.hasMetadata("current_viewing_crate") && !p.hasMetadata("opening_crate")) {
             e.setCancelled(true);
             if (e.getClickedInventory() == e.getView().getBottomInventory()) return;
             ItemStack item = e.getCurrentItem();
@@ -31,18 +29,18 @@ public class CrateListener implements Listener {
             if (keys <= 0) {
                 p.closeInventory();
                 plugin.getCrateManager().playSound(p, "no-key");
-                plugin.sendMsg(p, "no-key", "%crate%", crateName);
+                plugin.sendMsg(p, "no-key", "%crate%", plugin.getCrateManager().toSmallCaps(crateName));
                 return;
             }
             plugin.getCrateManager().openConfirmMenu(p, crateName, item);
             return;
         }
 
-        if (title.contains("xáᴄ ɴʜậɴ") || title.contains("XÁC NHẬN")) {
+        if (p.hasMetadata("opening_crate")) {
             e.setCancelled(true);
             int slot = e.getRawSlot();
-            if (!p.hasMetadata("opening_crate")) return;
             String crateName = p.getMetadata("opening_crate").get(0).asString();
+            
             if (slot == plugin.getConfig().getInt("confirm-gui.confirm-slot")) {
                 if (p.getInventory().firstEmpty() == -1) {
                     plugin.sendMsg(p, "inv-full");
@@ -52,13 +50,17 @@ public class CrateListener implements Listener {
                 if (item != null && plugin.getCrateManager().takeKey(p.getName(), crateName)) {
                     p.getInventory().addItem(item.clone());
                     plugin.getCrateManager().playSound(p, "open-success");
-                    plugin.sendMsg(p, "open-success", "%crate%", crateName);
+                    plugin.sendMsg(p, "open-success", "%crate%", plugin.getCrateManager().toSmallCaps(crateName));
+                    p.removeMetadata("opening_crate", plugin);
+                    p.removeMetadata("current_viewing_crate", plugin);
                     p.closeInventory();
-                } else { 
+                } else {
                     p.closeInventory();
-                    plugin.sendMsg(p, "no-key", "%crate%", crateName);
+                    plugin.sendMsg(p, "no-key", "%crate%", plugin.getCrateManager().toSmallCaps(crateName));
                 }
             } else if (slot == plugin.getConfig().getInt("confirm-gui.cancel-slot")) {
+                p.removeMetadata("opening_crate", plugin);
+                p.removeMetadata("current_viewing_crate", plugin);
                 p.closeInventory();
                 plugin.getCrateManager().playSound(p, "close-preview");
             }
@@ -76,8 +78,10 @@ public class CrateListener implements Listener {
                 p.removeMetadata("editing_crate_name", plugin);
             }
         }
-        p.removeMetadata("current_viewing_crate", plugin);
-        p.removeMetadata("opening_crate", plugin);
+        if (!p.getOpenInventory().getTitle().contains("xáᴄ ɴʜậɴ")) {
+            p.removeMetadata("current_viewing_crate", plugin);
+            p.removeMetadata("opening_crate", plugin);
+        }
     }
 
     @EventHandler
@@ -88,4 +92,4 @@ public class CrateListener implements Listener {
         e.setCancelled(true); 
         plugin.getCrateManager().openPreview(e.getPlayer(), name); 
     }
-            }
+                               }
