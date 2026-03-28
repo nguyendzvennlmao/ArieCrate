@@ -1,30 +1,30 @@
 messages:
   reload-success:
-    text: "&#facc15ᴀʀɪsᴄʀᴀᴛᴇ &8» &#facc15Đã ᴛảɪ ʟạɪ ᴄấᴜ ʜɪ̀ɴʜ ᴛʜàɴʜ ᴄôɴɢ!"
+    text: "&aĐã ᴛảɪ ʟạɪ ᴄấᴜ ʜɪ̀ɴʜ ᴛʜàɴʜ ᴄôɴɢ!"
     chat: true
     actionbar: false
 
   crate-create:
-    text: "&#facc15ᴀʀɪsᴄʀᴀᴛᴇ &8» &#facc15Đã ᴛʜɪếᴛ ʟậᴘ ʀưᴏ̛ɴɢ &#ff0812%crate% &fᴛạɪ vị ᴛʀɪ́ ɴàʏ!"
+    text: "&aĐã ᴛʜɪếᴛ ʟậᴘ ʀưᴏ̛ɴɢ %crate% &fᴛạɪ vị ᴛʀɪ́ ɴàʏ!"
     chat: true
     actionbar: true
 
   receive-key:
-    text: "&#facc15ᴀʀɪsᴄʀᴀᴛᴇ &8» &fʙạɴ ɴʜậɴ đượᴄ &#facc15%amount% &fᴄʜɪ̀ᴀ ᴋʜóᴀ &#ff0812%crate%!"
+    text: "&fʙạɴ ɴʜậɴ đượᴄ &#facc15%amount% &fᴄʜɪ̀ᴀ ᴋʜóᴀ &#ff0812%crate%!"
     chat: true
     actionbar: true
 
   no-key:
-    text: "&#ff0812ᴀʀɪsᴄʀᴀᴛᴇ &8» &fʙạɴ ᴋʜôɴɢ ᴄó ᴄʜɪ̀ᴀ ᴋʜóᴀ để ᴍở ʀưᴏ̛ɴɢ &#ff0812%crate%!"
+    text: "&#ff0812ʙạɴ ᴋʜôɴɢ ᴄó ᴄʜɪ̀ᴀ ᴋʜóᴀ để ᴍở ʀưᴏ̛ɴɢ &#ff0812%crate%!"
     chat: true
     actionbar: true
 
   open-success:
-    text: "&#facc15ᴀʀɪsᴄʀᴀᴛᴇ &8» &fᴍở ʀưᴏ̛ɴɢ &#ff0812%crate% &fᴛʜàɴʜ ᴄôɴɢ!"
+    text: "&fᴍở ʀưᴏ̛ɴɢ &#ff0812%crate% &fᴛʜàɴʜ ᴄôɴɢ!"
     chat: true
     actionbar: true
 
   inv-full:
-    text: "&#ff0812ᴀʀɪsᴄʀᴀᴛᴇ &8» &fʜàɴʜ ᴛʀᴀɴɢ đầy, ᴋʜôɴɢ ᴛʜể ɴʜậɴ ᴠậᴛ ᴘʜẩᴍ!"
+    text: "&fʜàɴʜ ᴛʀᴀɴɢ đầy, ᴋʜôɴɢ ᴛʜể ɴʜậɴ ᴠậᴛ ᴘʜẩᴍ!"
     chat: true
     actionbar: true
