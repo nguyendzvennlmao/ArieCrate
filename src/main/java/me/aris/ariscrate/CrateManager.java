@@ -30,10 +30,22 @@ public class CrateManager {
         return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
     }
 
+    public String toSmallCaps(String input) {
+        String normal = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        String small = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢ0123456789";
+        StringBuilder sb = new StringBuilder();
+        for (char c : input.toCharArray()) {
+            int index = normal.indexOf(c);
+            if (index != -1) sb.append(small.charAt(index));
+            else sb.append(c);
+        }
+        return sb.toString();
+    }
+
     public void playSound(Player p, String path) {
         String soundName = plugin.getConfig().getString("sounds." + path);
         if (soundName != null) {
-            p.playSound(p.getLocation(), Sound.valueOf(soundName), 1f, 1f);
+            try { p.playSound(p.getLocation(), Sound.valueOf(soundName), 1f, 1f); } catch (Exception e) {}
         }
     }
 
@@ -45,7 +57,7 @@ public class CrateManager {
     public void openPreview(Player p, String c) {
         runTask(p, () -> {
             FileConfiguration cfg = getCrateConfig(c);
-            String title = translateHex(cfg.getString("display-name", "&#facc15ʀưᴏ̛ɴɢ " + c.toUpperCase()));
+            String title = translateHex(cfg.getString("display-name", "&8ᴄʀᴀᴛᴇ " + toSmallCaps(c)));
             int rows = cfg.getInt("rows", 3) * 9;
             Inventory inv = Bukkit.createInventory(null, rows, title);
             if (cfg.contains("rewards")) {
@@ -53,8 +65,8 @@ public class CrateManager {
                     inv.setItem(Integer.parseInt(key), cfg.getItemStack("rewards." + key));
                 }
             }
-            p.openInventory(inv);
             p.setMetadata("current_viewing_crate", new FixedMetadataValue(plugin, c));
+            p.openInventory(inv);
             playSound(p, "open-preview");
         });
     }
@@ -77,7 +89,7 @@ public class CrateManager {
     public void openConfirmMenu(Player p, String crateName, ItemStack selectedItem) {
         runTask(p, () -> {
             p.setMetadata("opening_crate", new FixedMetadataValue(plugin, crateName));
-            String title = translateHex("&#facc15xáᴄ ɴʜậɴ " + crateName.toUpperCase());
+            String title = translateHex("&#facc15xáᴄ ɴʜậɴ " + toSmallCaps(crateName));
             Inventory inv = Bukkit.createInventory(null, 27, title);
             var cfg = plugin.getConfig();
             inv.setItem(cfg.getInt("confirm-gui.cancel-slot"), createItem(cfg.getString("confirm-gui.cancel.material"), cfg.getString("confirm-gui.cancel.name"), cfg.getStringList("confirm-gui.cancel.lore")));
@@ -104,7 +116,7 @@ public class CrateManager {
             try { 
                 file.createNewFile();
                 FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-                cfg.set("display-name", "&#facc15ʀưᴏ̛ɴɢ " + crateName.toUpperCase());
+                cfg.set("display-name", "&8ᴄʀᴀᴛᴇ " + toSmallCaps(crateName));
                 cfg.set("rows", 3);
                 cfg.save(file);
             } catch (Exception e) {}
@@ -146,7 +158,7 @@ public class CrateManager {
         int current = plugin.getKeyConfig().getInt(path, 0);
         plugin.getKeyConfig().set(path, current + amount);
         plugin.saveKeyConfig();
-        plugin.sendMsg(target, "receive-key", "%amount%", String.valueOf(amount), "%crate%", crateName);
+        plugin.sendMsg(target, "receive-key", "%amount%", String.valueOf(amount), "%crate%", toSmallCaps(crateName));
         playSound(target, "receive-key");
     }
 
@@ -157,4 +169,4 @@ public class CrateManager {
         plugin.saveKeyConfig();
         return true;
     }
-                        }
+                }
