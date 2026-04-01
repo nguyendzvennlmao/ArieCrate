@@ -72,4 +72,4 @@ public class ArisCrate extends JavaPlugin {
     public FileConfiguration getGuiConfig() { return guiConfig; }
     public FileConfiguration getMsgConfig() { return msgConfig; }
     public Map<UUID, String> getSelectingCrate() { return selectingCrate; }
-          }
+}
