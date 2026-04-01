@@ -11,22 +11,27 @@ public class CrateListener implements Listener {
     private final ArisCrate plugin;
     public CrateListener(ArisCrate plugin) { this.plugin = plugin; }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onClick(InventoryClickEvent e) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onInventoryClick(InventoryClickEvent e) {
+        if (!(e.getWhoClicked() instanceof Player p)) return;
+        
+        boolean isPreview = p.hasMetadata("current_viewing_crate");
+        boolean isConfirm = p.hasMetadata("opening_crate");
+        
+        if (!isPreview && !isConfirm) return;
+        if (e.getView().getTitle().startsWith("Editing: ")) return;
+
+        e.setCancelled(true);
+        e.setResult(Event.Result.DENY);
+
         if (e.getClickedInventory() == null) return;
-        Player p = (Player) e.getWhoClicked();
-        String title = e.getView().getTitle();
 
-        if (title.startsWith("Editing: ")) return;
-
-        if (p.hasMetadata("current_viewing_crate") || p.hasMetadata("opening_crate")) {
-            e.setCancelled(true);
+        if (isConfirm) {
+            int slot = e.getRawSlot();
+            String crateName = p.getMetadata("opening_crate").get(0).asString();
             
-            if (p.hasMetadata("opening_crate")) {
-                int slot = e.getRawSlot();
-                String crateName = p.getMetadata("opening_crate").get(0).asString();
-                
-                if (slot == plugin.getConfig().getInt("confirm-gui.confirm-slot")) {
+            if (slot == plugin.getConfig().getInt("confirm-gui.confirm-slot")) {
+                plugin.getCrateManager().runTask(p, () -> {
                     if (p.getInventory().firstEmpty() == -1) {
                         plugin.sendMsg(p, "inv-full");
                         p.closeInventory();
@@ -37,34 +42,39 @@ public class CrateListener implements Listener {
                         p.getInventory().addItem(item.clone());
                         plugin.getCrateManager().playSound(p, "open-success");
                         plugin.sendMsg(p, "open-success", "%crate%", plugin.getCrateManager().toSmallCaps(crateName));
-                        p.removeMetadata("opening_crate", plugin);
-                        p.removeMetadata("current_viewing_crate", plugin);
-                        p.closeInventory();
                     } else {
-                        p.closeInventory();
                         plugin.sendMsg(p, "no-key", "%crate%", plugin.getCrateManager().toSmallCaps(crateName));
                     }
-                } else if (slot == plugin.getConfig().getInt("confirm-gui.cancel-slot")) {
+                    p.removeMetadata("opening_crate", plugin);
+                    p.removeMetadata("current_viewing_crate", plugin);
+                    p.closeInventory();
+                });
+            } else if (slot == plugin.getConfig().getInt("confirm-gui.cancel-slot")) {
+                plugin.getCrateManager().runTask(p, () -> {
                     p.removeMetadata("opening_crate", plugin);
                     p.removeMetadata("current_viewing_crate", plugin);
                     p.closeInventory();
                     plugin.getCrateManager().playSound(p, "close-preview");
-                }
-                return;
+                });
             }
+            return;
+        }
 
-            if (e.getClickedInventory() == e.getView().getTopInventory()) {
-                ItemStack item = e.getCurrentItem();
-                if (item == null || item.getType().isAir()) return;
-                String crateName = p.getMetadata("current_viewing_crate").get(0).asString();
-                int keys = plugin.getKeyConfig().getInt(p.getName() + "." + crateName, 0);
-                if (keys <= 0) {
-                    p.closeInventory();
-                    plugin.sendMsg(p, "no-key", "%crate%", plugin.getCrateManager().toSmallCaps(crateName));
-                    return;
-                }
+        if (isPreview && e.getClickedInventory().equals(e.getView().getTopInventory())) {
+            ItemStack item = e.getCurrentItem();
+            if (item == null || item.getType().isAir()) return;
+            
+            String crateName = p.getMetadata("current_viewing_crate").get(0).asString();
+            plugin.getCrateManager().runTask(p, () -> {
                 plugin.getCrateManager().openConfirmMenu(p, crateName, item);
-            }
+            });
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onDrag(InventoryDragEvent e) {
+        if (e.getWhoClicked().hasMetadata("current_viewing_crate") || e.getWhoClicked().hasMetadata("opening_crate")) {
+            e.setCancelled(true);
         }
     }
 
@@ -75,11 +85,11 @@ public class CrateListener implements Listener {
             if (p.hasMetadata("editing_crate_name")) {
                 String name = p.getMetadata("editing_crate_name").get(0).asString();
                 plugin.getCrateManager().saveCrateItems(name, e.getInventory());
-                p.sendMessage("§aĐã lưu vật phẩm vào rương: " + name);
                 p.removeMetadata("editing_crate_name", plugin);
             }
         }
-        if (!p.getOpenInventory().getTitle().contains("xáᴄ ɴʜậɴ")) {
+        
+        if (!e.getView().getTitle().contains("xáᴄ ɴʜậɴ")) {
             p.removeMetadata("current_viewing_crate", plugin);
             p.removeMetadata("opening_crate", plugin);
         }
@@ -90,7 +100,7 @@ public class CrateListener implements Listener {
         if (e.getClickedBlock() == null) return;
         String name = plugin.getCrateManager().getCrateAt(e.getClickedBlock().getLocation());
         if (name == null) return;
-        e.setCancelled(true); 
-        plugin.getCrateManager().openPreview(e.getPlayer(), name); 
+        e.setCancelled(true);
+        plugin.getCrateManager().openPreview(e.getPlayer(), name);
     }
-        }
+                }
