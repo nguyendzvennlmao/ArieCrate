@@ -11,11 +11,11 @@ public class CrateListener implements Listener {
     private final ArisCrate plugin;
     public CrateListener(ArisCrate plugin) { this.plugin = plugin; }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent e) {
         if (e.getClickedInventory() == null) return;
-        String title = e.getView().getTitle();
         Player p = (Player) e.getWhoClicked();
+        String title = e.getView().getTitle();
 
         if (title.startsWith("Editing: ")) return;
 
@@ -29,6 +29,7 @@ public class CrateListener implements Listener {
                 if (slot == plugin.getConfig().getInt("confirm-gui.confirm-slot")) {
                     if (p.getInventory().firstEmpty() == -1) {
                         plugin.sendMsg(p, "inv-full");
+                        p.closeInventory();
                         return;
                     }
                     ItemStack item = e.getInventory().getItem(plugin.getConfig().getInt("confirm-gui.display-slot"));
@@ -59,7 +60,6 @@ public class CrateListener implements Listener {
                 int keys = plugin.getKeyConfig().getInt(p.getName() + "." + crateName, 0);
                 if (keys <= 0) {
                     p.closeInventory();
-                    plugin.getCrateManager().playSound(p, "no-key");
                     plugin.sendMsg(p, "no-key", "%crate%", plugin.getCrateManager().toSmallCaps(crateName));
                     return;
                 }
@@ -93,4 +93,4 @@ public class CrateListener implements Listener {
         e.setCancelled(true); 
         plugin.getCrateManager().openPreview(e.getPlayer(), name); 
     }
-                        }
+        }
