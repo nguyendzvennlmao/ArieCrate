@@ -1,16 +1,11 @@
 name: ArisCrate
 version: 1.0
 main: me.aris.ariscrate.ArisCrate
-api-version: 1.20
+api-version: "1.20"
 author: VennLMAO
-description: ArisCrate Plugin by VennLMAO
-softdepend: [PlaceholderAPI]
+folia-supported: true
 commands:
   ariscrate:
     description: Main command for ArisCrate
     aliases: [acrate, arcrate]
     permission: ariscrate.admin
-permissions:
-  ariscrate.admin:
-    description: Allows use of ArisCrate admin commands
-    default: op
