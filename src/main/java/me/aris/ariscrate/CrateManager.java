@@ -170,4 +170,4 @@ public class CrateManager {
         plugin.saveKeyConfig();
         return true;
     }
-                }
+    }
