@@ -33,7 +33,7 @@ public class MenuListener implements Listener {
                     if (item != null && item.getType() != Material.AIR) c.getItems().put(i, item);
                 }
                 plugin.getCrateManager().save();
-                e.getPlayer().sendMessage("§aĐã lưu nội dung Crate.");
+                e.getPlayer().sendMessage("§aSaved.");
             }
         }
     }
@@ -72,10 +72,12 @@ public class MenuListener implements Listener {
             ItemStack reward = e.getInventory().getItem(gui.getInt("confirm-gui.display-slot"));
             String name = plugin.getSelectingCrate().get(p.getUniqueId());
             if (reward != null && plugin.getKeyManager().takeKeys(p.getUniqueId(), name, 1)) {
-                p.getInventory().addItem(DogAdonisHook.unfreeze(reward.clone()));
+                p.getScheduler().execute(plugin, () -> {
+                    p.getInventory().addItem(DogAdonisHook.unfreeze(reward.clone()));
+                    p.closeInventory();
+                }, null, 1L);
                 p.playSound(p.getLocation(), Sound.valueOf(plugin.getConfig().getString("sounds.open-success")), 1, 1);
                 plugin.sendNotify(p, "open-success", "%crate%", name, "%item%", reward.getType().name());
-                p.closeInventory();
             }
         }
     }
@@ -83,20 +85,17 @@ public class MenuListener implements Listener {
     private void openConfirm(Player p, ItemStack item) {
         var gui = plugin.getGuiConfig();
         Inventory inv = Bukkit.createInventory(null, gui.getInt("confirm-gui.size"), ColorUtils.color(gui.getString("confirm-gui.title")));
-        
         ItemStack confirm = new ItemStack(Material.valueOf(gui.getString("confirm-gui.items.confirm.material")));
         ItemMeta cm = confirm.getItemMeta();
         cm.setDisplayName(ColorUtils.color(gui.getString("confirm-gui.items.confirm.name")));
         confirm.setItemMeta(cm);
-        
         ItemStack cancel = new ItemStack(Material.valueOf(gui.getString("confirm-gui.items.cancel.material")));
         ItemMeta cam = cancel.getItemMeta();
         cam.setDisplayName(ColorUtils.color(gui.getString("confirm-gui.items.cancel.name")));
         cancel.setItemMeta(cam);
-
         inv.setItem(gui.getInt("confirm-gui.confirm-slot"), confirm);
         inv.setItem(gui.getInt("confirm-gui.cancel-slot"), cancel);
         inv.setItem(gui.getInt("confirm-gui.display-slot"), item);
         p.openInventory(inv);
     }
-    }
+                                           }
