@@ -1,0 +1,6 @@
+messages:
+  no-key: "&cBạn không có chìa khóa cho crate %crate%!"
+  open-success: "&aBạn đã nhận được %item% từ %crate%!"
+  created-crate: "&aĐã tạo crate &e%crate% &atại vị trí này."
+  no-permission: "&cBạn không đủ quyền!"
+  reload: "&aĐã reload cấu hình!"
