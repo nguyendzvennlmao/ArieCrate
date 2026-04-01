@@ -1,6 +1,7 @@
 package me.aris.ariscrate.key;
 
 import me.aris.ariscrate.ArisCrate;
+import me.aris.ariscrate.crate.CrateData;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -9,11 +10,14 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class KeyManager {
     private final ArisCrate plugin;
     private File file;
     private FileConfiguration config;
+    private final Map<String, CrateData> crateCache = new HashMap<>();
 
     public KeyManager(ArisCrate plugin) {
         this.plugin = plugin;
@@ -54,15 +58,27 @@ public class KeyManager {
         config.set("locations." + name + ".y", loc.getY());
         config.set("locations." + name + ".z", loc.getZ());
         save();
+        crateCache.put(name, new CrateData(name, loc));
     }
 
     public void delete(String name) {
         config.set("locations." + name, null);
         save();
+        crateCache.remove(name);
     }
 
-    public Object get(String path) {
-        return config.get(path);
+    public CrateData get(String name) {
+        if (crateCache.containsKey(name)) return crateCache.get(name);
+        if (config.contains("locations." + name)) {
+            String world = config.getString("locations." + name + ".world");
+            double x = config.getDouble("locations." + name + ".x");
+            double y = config.getDouble("locations." + name + ".y");
+            double z = config.getDouble("locations." + name + ".z");
+            CrateData data = new CrateData(name, new Location(org.bukkit.Bukkit.getWorld(world), x, y, z));
+            crateCache.put(name, data);
+            return data;
+        }
+        return null;
     }
 
     public Set<String> getNames() {
@@ -71,8 +87,6 @@ public class KeyManager {
     }
 
     public void save() {
-        try { 
-            config.save(file); 
-        } catch (IOException e) {}
+        try { config.save(file); } catch (IOException e) {}
     }
-                   }
+                            }
