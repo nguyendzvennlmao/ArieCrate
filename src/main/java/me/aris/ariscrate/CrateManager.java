@@ -96,7 +96,6 @@ public class CrateManager {
             inv.setItem(cfg.getInt("confirm-gui.display-slot"), selectedItem.clone());
             inv.setItem(cfg.getInt("confirm-gui.confirm-slot"), createItem(cfg.getString("confirm-gui.confirm.material"), cfg.getString("confirm-gui.confirm.name"), cfg.getStringList("confirm-gui.confirm.lore")));
             p.openInventory(inv);
-            playSound(p, "confirm-click");
         });
     }
 
@@ -114,6 +113,7 @@ public class CrateManager {
         File file = new File(plugin.getDataFolder() + "/crates", crateName + ".yml");
         if (!file.exists()) {
             try { 
+                file.getParentFile().mkdirs();
                 file.createNewFile();
                 FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
                 cfg.set("display-name", "&8ᴄʀᴀᴛᴇ " + toSmallCaps(crateName));
@@ -151,15 +151,6 @@ public class CrateManager {
             item.setItemMeta(meta);
         }
         return item;
-    }
-
-    public void giveKey(Player target, String crateName, int amount) {
-        String path = target.getName() + "." + crateName;
-        int current = plugin.getKeyConfig().getInt(path, 0);
-        plugin.getKeyConfig().set(path, current + amount);
-        plugin.saveKeyConfig();
-        plugin.sendMsg(target, "receive-key", "%amount%", String.valueOf(amount), "%crate%", toSmallCaps(crateName));
-        playSound(target, "receive-key");
     }
 
     public boolean takeKey(String p, String c) {
