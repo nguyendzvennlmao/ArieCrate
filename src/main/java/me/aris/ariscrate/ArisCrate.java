@@ -40,15 +40,12 @@ public class ArisCrate extends JavaPlugin implements CommandExecutor, TabComplet
     public void loadConfigs() {
         saveDefaultConfig();
         reloadConfig();
-        
         File fMsg = new File(getDataFolder(), "message.yml");
         if (!fMsg.exists()) saveResource("message.yml", false);
         msgCfg = YamlConfiguration.loadConfiguration(fMsg);
-
         File fGui = new File(getDataFolder(), "gui.yml");
         if (!fGui.exists()) saveResource("gui.yml", false);
         guiCfg = YamlConfiguration.loadConfiguration(fGui);
-
         File cratesFolder = new File(getDataFolder(), "crates");
         if (!cratesFolder.exists()) cratesFolder.mkdirs();
     }
@@ -65,12 +62,7 @@ public class ArisCrate extends JavaPlugin implements CommandExecutor, TabComplet
             if (args.length < 3) return true;
             String type = args[1];
             int amt = Integer.parseInt(args[2]);
-            if (args.length > 3) {
-                Player target = Bukkit.getPlayer(args[3]);
-                if (target != null) give(target, type, amt, false);
-            } else {
-                Bukkit.getOnlinePlayers().forEach(p -> give(p, type, amt, false));
-            }
+            Bukkit.getOnlinePlayers().forEach(p -> give(p, type, amt, false));
             return true;
         }
         return true;
@@ -79,11 +71,6 @@ public class ArisCrate extends JavaPlugin implements CommandExecutor, TabComplet
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
         if (args.length == 1) return List.of("givekeyall", "reload");
-        if (args[0].equalsIgnoreCase("givekeyall") && args.length == 2) {
-            File folder = new File(getDataFolder(), "crates");
-            File[] files = folder.listFiles();
-            if (files != null) return Arrays.stream(files).filter(f -> f.getName().endsWith(".yml")).map(f -> f.getName().replace(".yml", "")).toList();
-        }
         return Collections.emptyList();
     }
 
@@ -109,5 +96,4 @@ public class ArisCrate extends JavaPlugin implements CommandExecutor, TabComplet
     public FileConfiguration getMessageConfig() { return msgCfg; }
     public FileConfiguration getGuiConfig() { return guiCfg; }
     public Map<UUID, String> getSelectingCrate() { return selectingCrate; }
-    public KeyAllTask getKeyAllTask() { return keyAllTask; }
-    }
+            }
