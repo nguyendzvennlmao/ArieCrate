@@ -10,24 +10,25 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import java.io.File;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ArisCrate extends JavaPlugin implements CommandExecutor, TabCompleter {
     private KeyManager keyManager;
     private KeyAllTask keyAllTask;
+    private FileConfiguration msgCfg;
+    private FileConfiguration guiCfg;
     private Map<UUID, String> selectingCrate = new HashMap<>();
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-        File cratesFolder = new File(getDataFolder(), "crates");
-        if (!cratesFolder.exists()) cratesFolder.mkdirs();
+        loadConfigs();
         this.keyManager = new KeyManager(this);
         this.keyManager.load();
         this.keyAllTask = new KeyAllTask(this);
@@ -36,10 +37,32 @@ public class ArisCrate extends JavaPlugin implements CommandExecutor, TabComplet
         Bukkit.getPluginManager().registerEvents(new MenuListener(this), this);
     }
 
+    public void loadConfigs() {
+        saveDefaultConfig();
+        reloadConfig();
+        
+        File fMsg = new File(getDataFolder(), "message.yml");
+        if (!fMsg.exists()) saveResource("message.yml", false);
+        msgCfg = YamlConfiguration.loadConfiguration(fMsg);
+
+        File fGui = new File(getDataFolder(), "gui.yml");
+        if (!fGui.exists()) saveResource("gui.yml", false);
+        guiCfg = YamlConfiguration.loadConfiguration(fGui);
+
+        File cratesFolder = new File(getDataFolder(), "crates");
+        if (!cratesFolder.exists()) cratesFolder.mkdirs();
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (args.length < 3) return true;
+        if (args.length == 0) return true;
+        if (args[0].equalsIgnoreCase("reload")) {
+            loadConfigs();
+            sender.sendMessage(ColorUtils.color("&aĐã reload thành công!"));
+            return true;
+        }
         if (args[0].equalsIgnoreCase("givekeyall")) {
+            if (args.length < 3) return true;
             String type = args[1];
             int amt = Integer.parseInt(args[2]);
             if (args.length > 3) {
@@ -55,31 +78,24 @@ public class ArisCrate extends JavaPlugin implements CommandExecutor, TabComplet
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
-        if (args.length == 1) return List.of("givekeyall");
-        if (args[0].equalsIgnoreCase("givekeyall")) {
-            if (args.length == 2) {
-                File folder = new File(getDataFolder(), "crates");
-                File[] files = folder.listFiles();
-                if (files != null) return Arrays.stream(files).map(f -> f.getName().replace(".yml", "")).collect(Collectors.toList());
-                return List.of("common");
-            }
-            if (args.length == 3) return List.of("1", "10", "64");
-            if (args.length == 4) return null;
+        if (args.length == 1) return List.of("givekeyall", "reload");
+        if (args[0].equalsIgnoreCase("givekeyall") && args.length == 2) {
+            File folder = new File(getDataFolder(), "crates");
+            File[] files = folder.listFiles();
+            if (files != null) return Arrays.stream(files).filter(f -> f.getName().endsWith(".yml")).map(f -> f.getName().replace(".yml", "")).toList();
         }
         return Collections.emptyList();
     }
 
     public void give(Player p, String type, int amt, boolean isAuto) {
         keyManager.addKeys(p.getUniqueId(), type, amt);
-        String sub = isAuto ? getConfig().getString("keyall.subtitle") : 
-                     getMessageConfig().getString("messages.receive-give").replace("%key%", type);
+        String sub = isAuto ? getConfig().getString("keyall.subtitle") : msgCfg.getString("messages.receive-give").replace("%key%", type);
         p.sendTitle("", ColorUtils.color(sub), 10, 40, 10);
         p.playSound(p.getLocation(), Sound.valueOf(getConfig().getString("sounds.receive-key")), 1, 1);
         sendNotify(p, "receive-give", "%key%", type, "%amount%", String.valueOf(amt));
     }
 
     public void sendNotify(Player p, String path, String... ph) {
-        var msgCfg = getMessageConfig();
         String msg = msgCfg.getString("messages." + path);
         if (msg == null) return;
         for (int i = 0; i < ph.length; i += 2) msg = msg.replace(ph[i], ph[i + 1]);
@@ -89,6 +105,9 @@ public class ArisCrate extends JavaPlugin implements CommandExecutor, TabComplet
     }
 
     public KeyManager getKeyManager() { return keyManager; }
-    public KeyAllTask getKeyAllTask() { return keyAllTask; }
+    public KeyManager getCrateManager() { return keyManager; }
+    public FileConfiguration getMessageConfig() { return msgCfg; }
+    public FileConfiguration getGuiConfig() { return guiCfg; }
     public Map<UUID, String> getSelectingCrate() { return selectingCrate; }
-            }
+    public KeyAllTask getKeyAllTask() { return keyAllTask; }
+    }
