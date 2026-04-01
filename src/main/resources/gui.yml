@@ -1,17 +1,29 @@
-choose-gui:
-  title: "&8ᴄʜᴏᴏsᴇ 1 ɪᴛᴇᴍ"
-  size: 27
-
 confirm-gui:
-  title: "&8ᴄᴏɴғɪʀᴍ"
-  size: 27
-  confirm-slot: 15
-  display-slot: 13
-  cancel-slot: 11
-  items:
-    confirm:
-      material: "LIME_STAINED_GLASS_PANE"
-      name: "#00FB4Bᴄᴏɴғɪʀᴍ"
-    cancel:
-      material: "RED_STAINED_GLASS_PANE"
-      name: "#FB0000ᴄᴀɴᴄᴇʟ"
+  title: "&#facc15&lᴀʀɪsᴄʀᴀᴛᴇ &8- &fXác nhận"
+  rows: 3
+  
+  confirm-item:
+    material: "LIME_STAINED_GLASS_PANE"
+    name: "&a&lXÁC NHẬN"
+    lore:
+      - "&7Click để sử dụng chìa khóa"
+      - "&7và tiến hành mở hòm."
+    slot: 11
+
+  cancel-item:
+    material: "RED_STAINED_GLASS_PANE"
+    name: "&c&lHỦY BỎ"
+    lore:
+      - "&7Click để thoát giao diện."
+    slot: 15
+
+  display-item:
+    material: "CHEST"
+    name: "&#facc15&lHòm: &f%key%"
+    lore:
+      - "&7Bạn đang chuẩn bị mở hòm."
+    slot: 13
+
+  filler:
+    material: "GRAY_STAINED_GLASS_PANE"
+    name: " "
