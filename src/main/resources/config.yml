@@ -1,10 +1,14 @@
 settings:
-  prefix: "&#facc15ᴀʀɪsᴄʀᴀᴛᴇ &8» "
-notification:
-  chat: true
-  actionbar: true
+  prefix: "&#facc15&lᴀʀɪsᴄʀᴀᴛᴇ &8» "
+  filler-glass: true
+  interact-cooldown: 1000
+
+keyall:
+  time: "1h"
+  subtitle: "&a+1 ᴄᴏᴍᴍᴏɴ"
+
 sounds:
-  open-preview: "BLOCK_CHEST_OPEN"
   open-success: "ENTITY_PLAYER_LEVELUP"
+  click: "UI_BUTTON_CLICK"
   error: "ENTITY_VILLAGER_NO"
-crates: {}
+  receive-key: "ENTITY_ITEM_PICKUP"
