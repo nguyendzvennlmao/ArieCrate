@@ -1,0 +1,10 @@
+settings:
+  prefix: "&#facc15ᴀʀɪsᴄʀᴀᴛᴇ &8» "
+notification:
+  chat: true
+  actionbar: true
+sounds:
+  open-preview: "BLOCK_CHEST_OPEN"
+  open-success: "ENTITY_PLAYER_LEVELUP"
+  error: "ENTITY_VILLAGER_NO"
+crates: {}
