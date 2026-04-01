@@ -3,15 +3,13 @@ package me.aris.ariscrate.key;
 import me.aris.ariscrate.ArisCrate;
 import me.aris.ariscrate.crate.CrateData;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
-import java.util.UUID;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class KeyManager {
     private final ArisCrate plugin;
@@ -32,6 +30,14 @@ public class KeyManager {
             } catch (IOException e) {}
         }
         config = YamlConfiguration.loadConfiguration(file);
+    }
+
+    public void give(Player player, String type, int amount, boolean silent) {
+        addKeys(player.getUniqueId(), type, amount);
+        if (!silent) {
+            player.playSound(player.getLocation(), Sound.valueOf(plugin.getConfig().getString("sounds.receive-key")), 1, 1);
+            plugin.sendNotify(player, "receive-give", "%key%", type, "%amount%", String.valueOf(amount));
+        }
     }
 
     public void addKeys(UUID uuid, String type, int amount) {
@@ -74,7 +80,7 @@ public class KeyManager {
             double x = config.getDouble("locations." + name + ".x");
             double y = config.getDouble("locations." + name + ".y");
             double z = config.getDouble("locations." + name + ".z");
-            CrateData data = new CrateData(name, new Location(org.bukkit.Bukkit.getWorld(world), x, y, z));
+            CrateData data = new CrateData(name, new Location(Bukkit.getWorld(world), x, y, z));
             crateCache.put(name, data);
             return data;
         }
@@ -89,4 +95,4 @@ public class KeyManager {
     public void save() {
         try { config.save(file); } catch (IOException e) {}
     }
-                            }
+    }
