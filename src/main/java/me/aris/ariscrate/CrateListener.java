@@ -5,13 +5,12 @@ import org.bukkit.event.*;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 
 public class CrateListener implements Listener {
     private final ArisCrate plugin;
     public CrateListener(ArisCrate plugin) { this.plugin = plugin; }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
         
@@ -19,7 +18,6 @@ public class CrateListener implements Listener {
         boolean isConfirm = p.hasMetadata("opening_crate");
         
         if (!isPreview && !isConfirm) return;
-        if (e.getView().getTitle().startsWith("Editing: ")) return;
 
         e.setCancelled(true);
         e.setResult(Event.Result.DENY);
@@ -57,10 +55,7 @@ public class CrateListener implements Listener {
                     plugin.getCrateManager().playSound(p, "close-preview");
                 });
             }
-            return;
-        }
-
-        if (isPreview && e.getClickedInventory().equals(e.getView().getTopInventory())) {
+        } else if (isPreview && e.getClickedInventory().equals(e.getView().getTopInventory())) {
             ItemStack item = e.getCurrentItem();
             if (item == null || item.getType().isAir()) return;
             
@@ -71,7 +66,7 @@ public class CrateListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onDrag(InventoryDragEvent e) {
         if (e.getWhoClicked().hasMetadata("current_viewing_crate") || e.getWhoClicked().hasMetadata("opening_crate")) {
             e.setCancelled(true);
@@ -81,14 +76,6 @@ public class CrateListener implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e) {
         Player p = (Player) e.getPlayer();
-        if (e.getView().getTitle().startsWith("Editing: ")) {
-            if (p.hasMetadata("editing_crate_name")) {
-                String name = p.getMetadata("editing_crate_name").get(0).asString();
-                plugin.getCrateManager().saveCrateItems(name, e.getInventory());
-                p.removeMetadata("editing_crate_name", plugin);
-            }
-        }
-        
         if (!e.getView().getTitle().contains("xáᴄ ɴʜậɴ")) {
             p.removeMetadata("current_viewing_crate", plugin);
             p.removeMetadata("opening_crate", plugin);
@@ -103,4 +90,4 @@ public class CrateListener implements Listener {
         e.setCancelled(true);
         plugin.getCrateManager().openPreview(e.getPlayer(), name);
     }
-                }
+}
