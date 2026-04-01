@@ -2,6 +2,7 @@ package me.aris.ariscrate.key;
 
 import me.aris.ariscrate.ArisCrate;
 import me.aris.ariscrate.crate.CrateData;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -95,4 +96,4 @@ public class KeyManager {
     public void save() {
         try { config.save(file); } catch (IOException e) {}
     }
-    }
+        }
