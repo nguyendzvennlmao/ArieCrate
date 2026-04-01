@@ -26,6 +26,35 @@ public class CrateManager {
         plugin.saveKeyConfig();
     }
 
+    public void openEditMenu(Player p, String crateName) {
+        runTask(p, () -> {
+            FileConfiguration cfg = getCrateConfig(crateName);
+            String title = translateHex("&#facc15Edit: " + toSmallCaps(crateName));
+            int rows = cfg.getInt("rows", 3) * 9;
+            Inventory inv = Bukkit.createInventory(null, rows, title);
+            if (cfg.contains("rewards")) {
+                for (String key : cfg.getConfigurationSection("rewards").getKeys(false)) {
+                    inv.setItem(Integer.parseInt(key), cfg.getItemStack("rewards." + key));
+                }
+            }
+            p.setMetadata("editing_crate", new FixedMetadataValue(plugin, crateName));
+            p.openInventory(inv);
+        });
+    }
+
+    public void saveCrateRewards(String crateName, Inventory inv) {
+        File file = new File(plugin.getDataFolder() + "/crates", crateName + ".yml");
+        FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        cfg.set("rewards", null);
+        for (int i = 0; i < inv.getSize(); i++) {
+            ItemStack item = inv.getItem(i);
+            if (item != null && item.getType() != Material.AIR) {
+                cfg.set("rewards." + i, item);
+            }
+        }
+        try { cfg.save(file); } catch (Exception e) {}
+    }
+
     public String translateHex(String msg) {
         if (msg == null) return "";
         Matcher matcher = hexPattern.matcher(msg);
@@ -141,4 +170,4 @@ public class CrateManager {
         plugin.saveKeyConfig();
         return true;
     }
-                                }
+                }
