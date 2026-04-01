@@ -10,7 +10,7 @@ public class CrateListener implements Listener {
     private final ArisCrate plugin;
     public CrateListener(ArisCrate plugin) { this.plugin = plugin; }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent e) {
         if (!(e.getWhoClicked() instanceof Player p)) return;
         
@@ -18,6 +18,7 @@ public class CrateListener implements Listener {
         boolean isConfirm = p.hasMetadata("opening_crate");
         
         if (!isPreview && !isConfirm) return;
+        if (p.hasMetadata("editing_crate")) return;
 
         e.setCancelled(true);
         e.setResult(Event.Result.DENY);
@@ -55,7 +56,10 @@ public class CrateListener implements Listener {
                     plugin.getCrateManager().playSound(p, "close-preview");
                 });
             }
-        } else if (isPreview && e.getClickedInventory().equals(e.getView().getTopInventory())) {
+            return;
+        }
+
+        if (isPreview && e.getClickedInventory().equals(e.getView().getTopInventory())) {
             ItemStack item = e.getCurrentItem();
             if (item == null || item.getType().isAir()) return;
             
@@ -76,6 +80,11 @@ public class CrateListener implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e) {
         Player p = (Player) e.getPlayer();
+        if (p.hasMetadata("editing_crate")) {
+            String crateName = p.getMetadata("editing_crate").get(0).asString();
+            plugin.getCrateManager().saveCrateRewards(crateName, e.getInventory());
+            p.removeMetadata("editing_crate", plugin);
+        }
         if (!e.getView().getTitle().contains("xáᴄ ɴʜậɴ")) {
             p.removeMetadata("current_viewing_crate", plugin);
             p.removeMetadata("opening_crate", plugin);
@@ -90,4 +99,4 @@ public class CrateListener implements Listener {
         e.setCancelled(true);
         plugin.getCrateManager().openPreview(e.getPlayer(), name);
     }
-}
+                                                 }
