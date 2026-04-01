@@ -2,6 +2,7 @@ package me.aris.ariscrate;
 
 import me.aris.ariscrate.command.CrateAdminCommand;
 import me.aris.ariscrate.key.KeyManager;
+import me.aris.ariscrate.crate.CrateManager;
 import me.aris.ariscrate.listener.CrateInteractListener;
 import me.aris.ariscrate.listener.MenuListener;
 import me.aris.ariscrate.task.KeyAllTask;
@@ -16,6 +17,7 @@ import java.util.*;
 
 public class ArisCrate extends JavaPlugin {
     private KeyManager keyManager;
+    private CrateManager crateManager;
     private FileConfiguration msgCfg;
     private FileConfiguration guiCfg;
     private final Map<UUID, String> selectingCrate = new HashMap<>();
@@ -26,12 +28,11 @@ public class ArisCrate extends JavaPlugin {
         loadConfigs();
         this.keyManager = new KeyManager(this);
         this.keyManager.load();
+        this.crateManager = new CrateManager(this);
         
         getCommand("acrate").setExecutor(new CrateAdminCommand(this));
-        
         Bukkit.getPluginManager().registerEvents(new MenuListener(this), this);
         Bukkit.getPluginManager().registerEvents(new CrateInteractListener(this), this);
-        
         new KeyAllTask(this).runTaskTimer(this, 72000L, 72000L);
     }
 
@@ -40,7 +41,6 @@ public class ArisCrate extends JavaPlugin {
         File fMsg = new File(getDataFolder(), "message.yml");
         if (!fMsg.exists()) saveResource("message.yml", false);
         msgCfg = YamlConfiguration.loadConfiguration(fMsg);
-        
         File fGui = new File(getDataFolder(), "gui.yml");
         if (!fGui.exists()) saveResource("gui.yml", false);
         guiCfg = YamlConfiguration.loadConfiguration(fGui);
@@ -52,15 +52,12 @@ public class ArisCrate extends JavaPlugin {
         for (int i = 0; i < ph.length; i += 2) {
             msg = msg.replace(ph[i], ph[i + 1]);
         }
-        p.sendMessage(ColorUtils.color(getConfig().getString("settings.prefix") + msg));
+        p.sendMessage(format(getConfig().getString("settings.prefix") + msg));
     }
 
-    public String format(String text) {
-        return ColorUtils.color(text);
-    }
-
+    public String format(String text) { return ColorUtils.color(text); }
     public KeyManager getKeyManager() { return keyManager; }
-    public KeyManager getCrateManager() { return keyManager; }
+    public CrateManager getCrateManagerLogic() { return crateManager; }
     public FileConfiguration getMessageConfig() { return msgCfg; }
     public FileConfiguration getGuiConfig() { return guiCfg; }
     public Map<UUID, String> getSelectingCrate() { return selectingCrate; }
