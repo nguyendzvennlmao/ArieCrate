@@ -1,6 +1,12 @@
+chat: true
+actionbar: true
+
 messages:
-  no-key: "&cBạn không có chìa khóa cho crate %crate%!"
-  open-success: "&aBạn đã nhận được %item% từ %crate%!"
-  created-crate: "&aĐã tạo crate &e%crate% &atại vị trí này."
-  no-permission: "&cBạn không đủ quyền!"
-  reload: "&aĐã reload cấu hình!"
+  no-key: "&cBạn không có chìa khóa %crate%!"
+  no-permission: "&cBạn không có quyền!"
+  teleport-crate: "&aĐã dịch chuyển %crate% lại bạn!"
+  not-found: "&cKhông tìm thấy crate đó!"
+  already-exists: "&cCrate đã tồn tại!"
+  give-key: "&aBạn đã give key cho %player%!"
+  take-key: "&aBạn đã take %amount% key của %player%!"
+  receive-give: "&a+1 %key%"
