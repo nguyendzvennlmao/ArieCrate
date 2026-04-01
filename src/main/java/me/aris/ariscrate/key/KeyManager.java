@@ -28,26 +28,20 @@ public class KeyManager {
     }
 
     public void addKeys(UUID uuid, String type, int amount) {
-        int current = getKeys(uuid, type);
+        int current = config.getInt(uuid.toString() + "." + type, 0);
         config.set(uuid.toString() + "." + type, current + amount);
         save();
     }
 
     public boolean takeKeys(UUID uuid, String type, int amount) {
-        int current = getKeys(uuid, type);
+        int current = config.getInt(uuid.toString() + "." + type, 0);
         if (current < amount) return false;
         config.set(uuid.toString() + "." + type, current - amount);
         save();
         return true;
     }
 
-    public int getKeys(UUID uuid, String type) {
-        return config.getInt(uuid.toString() + "." + type, 0);
-    }
-
     private void save() {
-        try { 
-            config.save(file); 
-        } catch (IOException e) {}
+        try { config.save(file); } catch (IOException e) {}
     }
-}
+    }
