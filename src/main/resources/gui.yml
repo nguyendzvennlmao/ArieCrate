@@ -1,0 +1,17 @@
+choose-gui:
+  title: "&8ᴄʜᴏᴏsᴇ 1 ɪᴛᴇᴍ"
+  size: 27
+
+confirm-gui:
+  title: "&8ᴄᴏɴғɪʀᴍ"
+  size: 27
+  confirm-slot: 15
+  display-slot: 13
+  cancel-slot: 11
+  items:
+    confirm:
+      material: "LIME_STAINED_GLASS_PANE"
+      name: "#00FB4Bᴄᴏɴғɪʀᴍ"
+    cancel:
+      material: "RED_STAINED_GLASS_PANE"
+      name: "#FB0000ᴄᴀɴᴄᴇʟ"
