@@ -20,6 +20,12 @@ public class CrateManager {
 
     public CrateManager(ArisCrate plugin) { this.plugin = plugin; }
 
+    public void giveKey(Player p, String crateName, int amount) {
+        int current = plugin.getKeyConfig().getInt(p.getName() + "." + crateName, 0);
+        plugin.getKeyConfig().set(p.getName() + "." + crateName, current + amount);
+        plugin.saveKeyConfig();
+    }
+
     public String translateHex(String msg) {
         if (msg == null) return "";
         Matcher matcher = hexPattern.matcher(msg);
@@ -71,21 +77,6 @@ public class CrateManager {
         });
     }
 
-    public void openEditMenu(Player p, String name) {
-        runTask(p, () -> {
-            FileConfiguration cfg = getCrateConfig(name);
-            int rows = cfg.getInt("rows", 3) * 9;
-            Inventory inv = Bukkit.createInventory(null, rows, "Editing: " + name);
-            if (cfg.contains("rewards")) {
-                for (String key : cfg.getConfigurationSection("rewards").getKeys(false)) {
-                    inv.setItem(Integer.parseInt(key), cfg.getItemStack("rewards." + key));
-                }
-            }
-            p.setMetadata("editing_crate_name", new FixedMetadataValue(plugin, name));
-            p.openInventory(inv);
-        });
-    }
-
     public void openConfirmMenu(Player p, String crateName, ItemStack selectedItem) {
         runTask(p, () -> {
             p.setMetadata("opening_crate", new FixedMetadataValue(plugin, crateName));
@@ -97,16 +88,6 @@ public class CrateManager {
             inv.setItem(cfg.getInt("confirm-gui.confirm-slot"), createItem(cfg.getString("confirm-gui.confirm.material"), cfg.getString("confirm-gui.confirm.name"), cfg.getStringList("confirm-gui.confirm.lore")));
             p.openInventory(inv);
         });
-    }
-
-    public void saveCrateItems(String name, Inventory inv) {
-        FileConfiguration cfg = getCrateConfig(name);
-        cfg.set("rewards", null);
-        for (int i = 0; i < inv.getSize(); i++) {
-            ItemStack item = inv.getItem(i);
-            if (item != null && item.getType() != Material.AIR) cfg.set("rewards." + i, item);
-        }
-        try { cfg.save(new File(plugin.getDataFolder() + "/crates", name + ".yml")); } catch (Exception e) {}
     }
 
     public FileConfiguration getCrateConfig(String crateName) {
@@ -160,4 +141,4 @@ public class CrateManager {
         plugin.saveKeyConfig();
         return true;
     }
-    }
+                                }
