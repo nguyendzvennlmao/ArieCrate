@@ -46,8 +46,6 @@ public class ArisCrate extends JavaPlugin implements CommandExecutor, TabComplet
         File fGui = new File(getDataFolder(), "gui.yml");
         if (!fGui.exists()) saveResource("gui.yml", false);
         guiCfg = YamlConfiguration.loadConfiguration(fGui);
-        File cratesFolder = new File(getDataFolder(), "crates");
-        if (!cratesFolder.exists()) cratesFolder.mkdirs();
     }
 
     @Override
@@ -55,31 +53,10 @@ public class ArisCrate extends JavaPlugin implements CommandExecutor, TabComplet
         if (args.length == 0) return true;
         if (args[0].equalsIgnoreCase("reload")) {
             loadConfigs();
-            sender.sendMessage(ColorUtils.color("&aĐã reload thành công!"));
-            return true;
-        }
-        if (args[0].equalsIgnoreCase("givekeyall")) {
-            if (args.length < 3) return true;
-            String type = args[1];
-            int amt = Integer.parseInt(args[2]);
-            Bukkit.getOnlinePlayers().forEach(p -> give(p, type, amt, false));
+            sender.sendMessage(ColorUtils.color("&aReloaded!"));
             return true;
         }
         return true;
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
-        if (args.length == 1) return List.of("givekeyall", "reload");
-        return Collections.emptyList();
-    }
-
-    public void give(Player p, String type, int amt, boolean isAuto) {
-        keyManager.addKeys(p.getUniqueId(), type, amt);
-        String sub = isAuto ? getConfig().getString("keyall.subtitle") : msgCfg.getString("messages.receive-give").replace("%key%", type);
-        p.sendTitle("", ColorUtils.color(sub), 10, 40, 10);
-        p.playSound(p.getLocation(), Sound.valueOf(getConfig().getString("sounds.receive-key")), 1, 1);
-        sendNotify(p, "receive-give", "%key%", type, "%amount%", String.valueOf(amt));
     }
 
     public void sendNotify(Player p, String path, String... ph) {
@@ -96,4 +73,4 @@ public class ArisCrate extends JavaPlugin implements CommandExecutor, TabComplet
     public FileConfiguration getMessageConfig() { return msgCfg; }
     public FileConfiguration getGuiConfig() { return guiCfg; }
     public Map<UUID, String> getSelectingCrate() { return selectingCrate; }
-            }
+    }
