@@ -254,16 +254,16 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
         for (Player p : Bukkit.getOnlinePlayers()) {
             plugin.getKeyManager().addKeys(p.getUniqueId(), crate, amount);
             
-            p.sendMessage(plugin.getMessageManager().getMessage("command.keyall-header"));
-            p.sendMessage(plugin.getMessageManager().getMessage("command.keyall-message")
+            p.sendMessage(plugin.getMessageManager().getRawMessage("command.keyall-header"));
+            p.sendMessage(plugin.getMessageManager().getRawMessage("command.keyall-message")
                 .replace("{amount}", String.valueOf(amount))
                 .replace("{key_name}", keyName)
                 .replace("{suffix}", suffix));
-            p.sendMessage(plugin.getMessageManager().getMessage("command.keyall-footer"));
+            p.sendMessage(plugin.getMessageManager().getRawMessage("command.keyall-footer"));
             
             p.sendTitle(
-                ColorUtils.color(plugin.getMessageManager().getMessage("command.keyall-title")),
-                ColorUtils.color(plugin.getMessageManager().getMessage("command.keyall-subtitle")
+                ColorUtils.color(plugin.getMessageManager().getRawMessage("command.keyall-title")),
+                ColorUtils.color(plugin.getMessageManager().getRawMessage("command.keyall-subtitle")
                     .replace("{amount}", String.valueOf(amount))
                     .replace("{key_name}", keyName)),
                 10, 60, 20
@@ -291,55 +291,72 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, String[] args) {
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!sender.hasPermission("ariscrate.admin")) {
             return Collections.emptyList();
         }
 
         if (args.length == 1) {
-            return List.of("crates", "delcrate", "additem", "give", "take", "keyall", "reload").stream()
+            List<String> commands = new ArrayList<>();
+            commands.add("crates");
+            commands.add("delcrate");
+            commands.add("additem");
+            commands.add("give");
+            commands.add("take");
+            commands.add("keyall");
+            commands.add("reload");
+            return commands.stream()
                 .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
                 .collect(Collectors.toList());
         }
 
         if (args.length == 2) {
-            switch (args[0].toLowerCase()) {
-                case "additem":
-                case "give":
-                case "take":
-                case "keyall":
-                case "delcrate":
-                    return new ArrayList<>(plugin.getCrateManager().getCrateNames());
+            String subCmd = args[0].toLowerCase();
+            if (subCmd.equals("additem") || subCmd.equals("give") || subCmd.equals("take") || subCmd.equals("keyall") || subCmd.equals("delcrate")) {
+                return new ArrayList<>(plugin.getCrateManager().getCrateNames());
             }
         }
 
         if (args.length == 3) {
-            switch (args[0].toLowerCase()) {
-                case "additem":
-                    List<String> slots = new ArrayList<>();
-                    for (int i = 0; i < 27; i++) {
-                        slots.add(String.valueOf(i));
-                    }
-                    return slots;
-                case "give":
-                    List<String> players = Bukkit.getOnlinePlayers().stream()
-                        .map(Player::getName)
-                        .collect(Collectors.toList());
-                    players.addAll(List.of("1", "5", "10", "64"));
-                    return players;
-                case "take":
-                    return Bukkit.getOnlinePlayers().stream()
-                        .map(Player::getName)
-                        .collect(Collectors.toList());
-                case "keyall":
-                    return List.of("1", "5", "10", "64");
+            String subCmd = args[0].toLowerCase();
+            if (subCmd.equals("additem")) {
+                List<String> slots = new ArrayList<>();
+                for (int i = 0; i < 27; i++) {
+                    slots.add(String.valueOf(i));
+                }
+                return slots;
+            }
+            if (subCmd.equals("give")) {
+                List<String> players = Bukkit.getOnlinePlayers().stream()
+                    .map(Player::getName)
+                    .collect(Collectors.toList());
+                players.addAll(List.of("1", "5", "10", "64"));
+                return players;
+            }
+            if (subCmd.equals("take")) {
+                return Bukkit.getOnlinePlayers().stream()
+                    .map(Player::getName)
+                    .collect(Collectors.toList());
+            }
+            if (subCmd.equals("keyall")) {
+                List<String> amounts = new ArrayList<>();
+                amounts.add("1");
+                amounts.add("5");
+                amounts.add("10");
+                amounts.add("64");
+                return amounts;
             }
         }
 
         if (args.length == 4 && args[0].equalsIgnoreCase("give")) {
-            return List.of("1", "5", "10", "64");
+            List<String> amounts = new ArrayList<>();
+            amounts.add("1");
+            amounts.add("5");
+            amounts.add("10");
+            amounts.add("64");
+            return amounts;
         }
 
         return Collections.emptyList();
     }
-}
+        }
