@@ -1,0 +1,47 @@
+prefix: "&8[&6ArisCrate&8] &7"
+
+command:
+  usage: "&cUsage: /ariscrate <crates|delcrate|additem|give|take|keyall|reload>"
+  only-player: "&cThis command can only be used by players."
+  console-must-specify: "&cConsole must specify player."
+  player-not-found: "&cPlayer not found"
+  invalid-number: "&cAmount must be a number"
+  invalid-slot: "&cSlot must be a number"
+  reloaded: "&aPlugin reloaded successfully!"
+  no-permission: "&cYou don't have permission to use this command!"
+  
+  create-usage: "&cUsage: /ariscrate crates <name>"
+  crate-exists: "&cCrate &e{name} &calready exists!"
+  crate-created: "&aCreated crate &e{name} &aat {x},{y},{z}"
+  
+  delete-usage: "&cUsage: /ariscrate delcrate <name>"
+  crate-deleted: "&aDeleted crate &e{name}"
+  crate-not-exist: "&cCrate &e{name} &cdoes not exist."
+  
+  additem-usage: "&cUsage: /ariscrate additem <crate> <slot>"
+  crate-not-exist-add: "&cCrate &e{crate} &cdoes not exist."
+  hold-item: "&cYou must hold an item in your hand."
+  item-added: "&aAdded item to crate &e{crate}&a at slot &e{slot}"
+  
+  give-usage: "&cUsage: /ariscrate give <key> <amount> | /ariscrate give <key> <player> <amount>"
+  key-given: "&aGave &e{amount} &akey(s) {key} to &e{target}"
+  
+  take-usage: "&cUsage: /ariscrate take <key> <player> <amount>"
+  key-taken: "&aTook &e{amount} &akey(s) {key} from &e{target}"
+  not-enough: "&cPlayer does not have enough keys."
+  
+  keyall-usage: "&cUsage: /ariscrate keyall <crate> <amount>"
+  keyall-header: "&8&m--------------------------------------------------"
+  keyall-message: " &a&lKEYALL &7» You received &e{amount} &f{key_name}{suffix}!"
+  keyall-footer: "&8&m--------------------------------------------------"
+  keyall-title: "#00FB4B&lKEYALL"
+  keyall-subtitle: "&f+{amount} &e{key_name}"
+  keyall-actionbar: "#00FB4B✔ &7Added &e{amount} &f{key_name}"
+  keyall-sender: "&aGave everyone &e{amount} &akey(s) for &e{crate}"
+
+crate:
+  no-key: "&cYou don't have a key for this crate!"
+  no-key-found: "&cNo key found."
+  not-enough-keys: "&cYou don't have enough keys."
+  received-broadcast: "&7Player #0EFF90{player} &7received item &7[{item}&7]!"
+  need-permission: "&cYou need {permission} to use this crate!"
