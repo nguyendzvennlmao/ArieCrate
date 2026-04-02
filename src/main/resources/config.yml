@@ -1,0 +1,15 @@
+sounds:
+  gui-click: UI_BUTTON_CLICK
+  no-key: ENTITY_VILLAGER_NO
+  reward: ENTITY_PLAYER_LEVELUP
+  keyall: ENTITY_PLAYER_LEVELUP
+  keyall-toast: UI_TOAST_CHALLENGE_COMPLETE
+
+settings:
+  hologram:
+    enabled: true
+    height: 1.0
+  particles:
+    enabled: true
+    amount: 10
+    speed: 1
