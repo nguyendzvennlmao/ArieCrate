@@ -1,7 +1,7 @@
 prefix: "&8[&6ArisCrate&8] &7"
 
 command:
-  usage: "&cUsage: /ariscrate <crates|delcrate|additem|give|take|keyall|reload>"
+  usage: "&cUsage: /ariscrate <crates|delcrate|additem|deleteitem|movehere|give|take|keyall|reload>"
   only-player: "&cThis command can only be used by players."
   console-must-specify: "&cConsole must specify player."
   player-not-found: "&cPlayer not found"
@@ -23,6 +23,13 @@ command:
   hold-item: "&cYou must hold an item in your hand."
   item-added: "&aAdded item to crate &e{crate}&a at slot &e{slot}"
   
+  deleteitem-usage: "&cUsage: /ariscrate deleteitem <crate> <slot>"
+  item-deleted: "&aDeleted item from crate &e{crate}&a at slot &e{slot}"
+  no-item-at-slot: "&cNo item found at slot &e{slot}"
+  
+  movehere-usage: "&cUsage: /ariscrate movehere <crate>"
+  crate-moved: "&aMoved crate &e{crate} &ato {x},{y},{z}"
+  
   give-usage: "&cUsage: /ariscrate give <key> <amount> | /ariscrate give <key> <player> <amount>"
   key-given: "&aGave &e{amount} &akey(s) {key} to &e{target}"
   
@@ -36,7 +43,6 @@ command:
   keyall-footer: "&8&m--------------------------------------------------"
   keyall-title: "#00FB4B&lKEYALL"
   keyall-subtitle: "&f+{amount} &e{key_name}"
-  keyall-actionbar: "#00FB4B✔ &7Added &e{amount} &f{key_name}"
   keyall-sender: "&aGave everyone &e{amount} &akey(s) for &e{crate}"
 
 crate:
