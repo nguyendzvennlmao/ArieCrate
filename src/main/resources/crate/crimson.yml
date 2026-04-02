@@ -1,0 +1,49 @@
+name: "crimson"
+display-name: "&cCrimson Crate"
+key-name: "&cCrimson Key"
+permission: "ariscrate.crate.crimson"
+
+items:
+  10:
+    material: NETHERITE_INGOT
+    amount: 1
+    name: "&8Netherite Ingot"
+    lore:
+      - "&cRare netherite"
+  11:
+    material: NETHERITE_SWORD
+    amount: 1
+    name: "&cCrimson Sword"
+    lore:
+      - "&7A powerful sword"
+  12:
+    material: ENCHANTED_GOLDEN_APPLE
+    amount: 3
+    name: "&6God Apple"
+    lore:
+      - "&7Ultimate food"
+  13:
+    material: TOTEM_OF_UNDYING
+    amount: 1
+    name: "&5Totem of Undying"
+    lore:
+      - "&7Save your life"
+  14:
+    material: NETHERITE_CHESTPLATE
+    amount: 1
+    name: "&cCrimson Chestplate"
+    lore:
+      - "&7Protection IV"
+
+settings:
+  hologram:
+    enabled: true
+    lines:
+      - "&8&m-------------"
+      - "     &cCrimson Crate"
+      - "&8&m-------------"
+  particles:
+    type: "FLAME"
+  sound:
+    open: "BLOCK_RESPAWN_ANCHOR_CHARGE"
+    reward: "ENTITY_WITHER_DEATH"
