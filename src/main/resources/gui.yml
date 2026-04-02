@@ -4,7 +4,6 @@ choose-gui:
   background:
     material: GRAY_STAINED_GLASS_PANE
     name: "&7"
-    slots: all
   permission: "ariscrate.user"
 
 confirm-gui:
@@ -13,7 +12,6 @@ confirm-gui:
   background:
     material: BLACK_STAINED_GLASS_PANE
     name: "&7"
-    slots: all
   permission: "ariscrate.user"
   items:
     cancel:
