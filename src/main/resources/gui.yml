@@ -1,0 +1,32 @@
+choose-gui:
+  title: "&8ᴄʜᴏᴏsᴇ 1 ɪᴛᴇᴍ"
+  size: 27
+  background:
+    material: GRAY_STAINED_GLASS_PANE
+    name: "&7"
+    slots: all
+  permission: "ariscrate.user"
+
+confirm-gui:
+  title: "&8ᴄᴏɴғɪʀᴍ"
+  size: 27
+  background:
+    material: BLACK_STAINED_GLASS_PANE
+    name: "&7"
+    slots: all
+  permission: "ariscrate.user"
+  items:
+    cancel:
+      material: RED_STAINED_GLASS_PANE
+      name: "#FB0000ᴄᴀɴᴄᴇʟ"
+      slot: 11
+      permission: "ariscrate.cancel"
+      lore:
+        - "&7Click to cancel"
+    confirm:
+      material: LIME_STAINED_GLASS_PANE
+      name: "#00FB4Bᴄᴏɴғɪʀᴍ"
+      slot: 15
+      permission: "ariscrate.confirm"
+      lore:
+        - "&7Click to confirm"
