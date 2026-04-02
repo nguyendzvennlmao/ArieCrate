@@ -125,4 +125,36 @@ public class GuiListener implements Listener {
                         boolean removed = plugin.getKeyManager().removeKey(player.getUniqueId(), crate.getName());
                         if (!removed) {
                             Sound sound = Sound.valueOf(plugin.getConfig().getString("sounds.no-key", "ENTITY_VILLAGER_NO"));
-                            player.play
+                            player.playSound(player.getLocation(), sound, 1.0f, 1.0f);
+                            player.sendMessage(plugin.getMessageManager().getMessage("crate.no-key-found"));
+                            player.closeInventory();
+                        } else {
+                            ItemStack give = DogAdonisHook.unfreeze(reward.clone());
+                            player.getInventory().addItem(give);
+                            
+                            Sound sound = Sound.valueOf(plugin.getConfig().getString("sounds.reward", "ENTITY_PLAYER_LEVELUP"));
+                            player.playSound(player.getLocation(), sound, 1.0f, 2.0f);
+                            
+                            String itemName;
+                            if (reward.hasItemMeta() && reward.getItemMeta().hasDisplayName()) {
+                                itemName = reward.getItemMeta().getDisplayName();
+                            } else {
+                                itemName = reward.getType().toString().toLowerCase().replace('_', ' ');
+                            }
+                            
+                            String msg = plugin.getMessageManager().getRawMessage("crate.received-broadcast")
+                                .replace("{player}", player.getName())
+                                .replace("{item}", itemName);
+                            Bukkit.getServer().broadcastMessage(ColorUtils.color(msg));
+                            
+                            player.closeInventory();
+                            plugin.getSelectingCrate().remove(player.getUniqueId());
+                        }
+                    }
+                }
+            }
+        } else {
+            event.setCancelled(true);
+        }
+    }
+                                                  }
