@@ -1,0 +1,76 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., 1.0.0)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'maven'
+    
+    - name: Get version
+      id: get_version
+      run: |
+        if [ "${{ github.event.inputs.version }}" != "" ]; then
+          VERSION=${{ github.event.inputs.version }}
+        elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          VERSION=${GITHUB_REF#refs/tags/v}
+        else
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Building version: $VERSION"
+    
+    - name: Update version in pom.xml
+      if: github.event.inputs.version != ''
+      run: |
+        mvn versions:set -DnewVersion=${{ steps.get_version.outputs.version }}
+        mvn versions:commit
+    
+    - name: Build with Maven
+      run: mvn clean package
+    
+    - name: List target directory
+      run: ls -la target/
+    
+    - name: Upload JAR artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ArisCrate-${{ steps.get_version.outputs.version }}
+        path: target/ArisCrate-*.jar
+        compression-level: 0
+    
+    - name: Create Release
+      if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.get_version.outputs.version }}
+        name: Release v${{ steps.get_version.outputs.version }}
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        files: target/ArisCrate-*.jar
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
