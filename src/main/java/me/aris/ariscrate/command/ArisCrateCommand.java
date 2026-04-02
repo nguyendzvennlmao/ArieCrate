@@ -30,7 +30,7 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("ariscrate.admin")) {
-            sender.sendMessage(plugin.getMessageManager().getMessage("command.no-permission"));
+            sender.sendMessage(ColorUtils.color("&cYou don't have permission to use this command!"));
             return true;
         }
 
@@ -42,35 +42,35 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
         switch (args[0].toLowerCase()) {
             case "crates":
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(plugin.getMessageManager().getMessage("command.only-player"));
+                    sender.sendMessage(ColorUtils.color("&cThis command can only be used by players."));
                     return true;
                 }
                 handleCreateCrate((Player) sender, args);
                 break;
             case "delcrate":
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(plugin.getMessageManager().getMessage("command.only-player"));
+                    sender.sendMessage(ColorUtils.color("&cThis command can only be used by players."));
                     return true;
                 }
                 handleDeleteCrate((Player) sender, args);
                 break;
             case "additem":
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(plugin.getMessageManager().getMessage("command.only-player"));
+                    sender.sendMessage(ColorUtils.color("&cThis command can only be used by players."));
                     return true;
                 }
                 handleAddItem((Player) sender, args);
                 break;
             case "deleteitem":
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(plugin.getMessageManager().getMessage("command.only-player"));
+                    sender.sendMessage(ColorUtils.color("&cThis command can only be used by players."));
                     return true;
                 }
                 handleDeleteItem((Player) sender, args);
                 break;
             case "movehere":
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(plugin.getMessageManager().getMessage("command.only-player"));
+                    sender.sendMessage(ColorUtils.color("&cThis command can only be used by players."));
                     return true;
                 }
                 handleMoveHere((Player) sender, args);
@@ -86,7 +86,7 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
                 break;
             case "reload":
                 plugin.reloadAllConfigs();
-                sender.sendMessage(plugin.getMessageManager().getMessage("command.reloaded"));
+                sender.sendMessage(ColorUtils.color("&aPlugin reloaded successfully!"));
                 break;
             default:
                 sendUsage(sender);
@@ -106,12 +106,14 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
         }
 
         String name = args[1];
-        Block target = player.getTargetBlockExact(5);
+        
+        Block targetBlock = player.getTargetBlockExact(5);
         Location loc;
-        if (target != null) {
-            loc = target.getLocation();
+        
+        if (targetBlock != null && targetBlock.getType().isSolid()) {
+            loc = targetBlock.getLocation();
         } else {
-            loc = player.getLocation().subtract(0, 1, 0).getBlock().getLocation();
+            loc = player.getLocation().getBlock().getLocation();
         }
 
         if (plugin.getCrateManager().crateExists(name)) {
@@ -214,17 +216,20 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
             return;
         }
         
-        Block target = player.getTargetBlockExact(5);
+        Block targetBlock = player.getTargetBlockExact(5);
         Location loc;
-        if (target != null) {
-            loc = target.getLocation();
+        
+        if (targetBlock != null && targetBlock.getType().isSolid()) {
+            loc = targetBlock.getLocation();
         } else {
-            loc = player.getLocation().subtract(0, 1, 0).getBlock().getLocation();
+            loc = player.getLocation().getBlock().getLocation();
         }
         
+        Location oldLoc = crate.getLocation();
         crate.setLocation(loc);
         plugin.getCrateManager().saveCrates();
-        player.sendMessage(ColorUtils.color("&aMoved crate &e" + crateName + " &ato " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ()));
+        player.sendMessage(ColorUtils.color("&aMoved crate &e" + crateName + " &afrom " + oldLoc.getBlockX() + "," + oldLoc.getBlockY() + "," + oldLoc.getBlockZ()));
+        player.sendMessage(ColorUtils.color("&aTo new location: &e" + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ()));
     }
 
     private void handleGiveKey(CommandSender sender, String[] args) {
@@ -410,4 +415,4 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
 
         return Collections.emptyList();
     }
-            }
+    }
