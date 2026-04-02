@@ -61,6 +61,20 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
                 }
                 handleAddItem((Player) sender, args);
                 break;
+            case "deleteitem":
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(plugin.getMessageManager().getMessage("command.only-player"));
+                    return true;
+                }
+                handleDeleteItem((Player) sender, args);
+                break;
+            case "movehere":
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(plugin.getMessageManager().getMessage("command.only-player"));
+                    return true;
+                }
+                handleMoveHere((Player) sender, args);
+                break;
             case "give":
                 handleGiveKey(sender, args);
                 break;
@@ -82,12 +96,12 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
     }
 
     private void sendUsage(CommandSender sender) {
-        sender.sendMessage(plugin.getMessageManager().getMessage("command.usage"));
+        sender.sendMessage(ColorUtils.color("&cUsage: /ariscrate <crates|delcrate|additem|deleteitem|movehere|give|take|keyall|reload>"));
     }
 
     private void handleCreateCrate(Player player, String[] args) {
         if (args.length < 2) {
-            player.sendMessage(plugin.getMessageManager().getMessage("command.create-usage"));
+            player.sendMessage(ColorUtils.color("&cUsage: /ariscrate crates <name>"));
             return;
         }
 
@@ -101,38 +115,32 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
         }
 
         if (plugin.getCrateManager().crateExists(name)) {
-            player.sendMessage(plugin.getMessageManager().getMessage("command.crate-exists")
-                .replace("{name}", name));
+            player.sendMessage(ColorUtils.color("&cCrate &e" + name + " &calready exists!"));
         } else {
             plugin.getCrateManager().createCrate(name, loc);
-            player.sendMessage(plugin.getMessageManager().getMessage("command.crate-created")
-                .replace("{name}", name)
-                .replace("{x}", String.valueOf(loc.getBlockX()))
-                .replace("{y}", String.valueOf(loc.getBlockY()))
-                .replace("{z}", String.valueOf(loc.getBlockZ())));
+            player.sendMessage(ColorUtils.color("&aCreated crate &e" + name + " &aat " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ()));
+            player.sendMessage(ColorUtils.color("&aConfig file created: &ecrate/" + name.toLowerCase() + ".yml"));
         }
     }
 
     private void handleDeleteCrate(Player player, String[] args) {
         if (args.length < 2) {
-            player.sendMessage(plugin.getMessageManager().getMessage("command.delete-usage"));
+            player.sendMessage(ColorUtils.color("&cUsage: /ariscrate delcrate <name>"));
             return;
         }
 
         String name = args[1];
         boolean success = plugin.getCrateManager().deleteCrate(name);
         if (success) {
-            player.sendMessage(plugin.getMessageManager().getMessage("command.crate-deleted")
-                .replace("{name}", name));
+            player.sendMessage(ColorUtils.color("&aDeleted crate &e" + name));
         } else {
-            player.sendMessage(plugin.getMessageManager().getMessage("command.crate-not-exist")
-                .replace("{name}", name));
+            player.sendMessage(ColorUtils.color("&cCrate &e" + name + " &cdoes not exist."));
         }
     }
 
     private void handleAddItem(Player player, String[] args) {
         if (args.length < 3) {
-            player.sendMessage(plugin.getMessageManager().getMessage("command.additem-usage"));
+            player.sendMessage(ColorUtils.color("&cUsage: /ariscrate additem <crate> <slot>"));
             return;
         }
 
@@ -141,14 +149,13 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
         try {
             slot = Integer.parseInt(args[2]);
         } catch (NumberFormatException e) {
-            player.sendMessage(plugin.getMessageManager().getMessage("command.invalid-slot"));
+            player.sendMessage(ColorUtils.color("&cSlot must be a number"));
             return;
         }
 
         Crate crate = plugin.getCrateManager().getCrate(crateName);
         if (crate == null) {
-            player.sendMessage(plugin.getMessageManager().getMessage("command.crate-not-exist-add")
-                .replace("{crate}", crateName));
+            player.sendMessage(ColorUtils.color("&cCrate &e" + crateName + " &cdoes not exist."));
             return;
         }
 
@@ -157,17 +164,72 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
             ItemStack store = DogAdonisHook.freeze(inHand.clone());
             crate.setItem(slot, store);
             plugin.getCrateManager().saveCrates();
-            player.sendMessage(plugin.getMessageManager().getMessage("command.item-added")
-                .replace("{crate}", crateName)
-                .replace("{slot}", String.valueOf(slot)));
+            player.sendMessage(ColorUtils.color("&aAdded item to crate &e" + crateName + "&a at slot &e" + slot));
         } else {
-            player.sendMessage(plugin.getMessageManager().getMessage("command.hold-item"));
+            player.sendMessage(ColorUtils.color("&cYou must hold an item in your hand."));
         }
+    }
+    
+    private void handleDeleteItem(Player player, String[] args) {
+        if (args.length < 3) {
+            player.sendMessage(ColorUtils.color("&cUsage: /ariscrate deleteitem <crate> <slot>"));
+            return;
+        }
+
+        String crateName = args[1];
+        int slot;
+        try {
+            slot = Integer.parseInt(args[2]);
+        } catch (NumberFormatException e) {
+            player.sendMessage(ColorUtils.color("&cSlot must be a number"));
+            return;
+        }
+
+        Crate crate = plugin.getCrateManager().getCrate(crateName);
+        if (crate == null) {
+            player.sendMessage(ColorUtils.color("&cCrate &e" + crateName + " &cdoes not exist."));
+            return;
+        }
+        
+        if (!crate.getItems().containsKey(slot)) {
+            player.sendMessage(ColorUtils.color("&cNo item found at slot &e" + slot));
+            return;
+        }
+        
+        crate.getItems().remove(slot);
+        plugin.getCrateManager().saveCrates();
+        player.sendMessage(ColorUtils.color("&aDeleted item from crate &e" + crateName + "&a at slot &e" + slot));
+    }
+    
+    private void handleMoveHere(Player player, String[] args) {
+        if (args.length < 2) {
+            player.sendMessage(ColorUtils.color("&cUsage: /ariscrate movehere <crate>"));
+            return;
+        }
+
+        String crateName = args[1];
+        Crate crate = plugin.getCrateManager().getCrate(crateName);
+        if (crate == null) {
+            player.sendMessage(ColorUtils.color("&cCrate &e" + crateName + " &cdoes not exist."));
+            return;
+        }
+        
+        Block target = player.getTargetBlockExact(5);
+        Location loc;
+        if (target != null) {
+            loc = target.getLocation();
+        } else {
+            loc = player.getLocation().subtract(0, 1, 0).getBlock().getLocation();
+        }
+        
+        crate.setLocation(loc);
+        plugin.getCrateManager().saveCrates();
+        player.sendMessage(ColorUtils.color("&aMoved crate &e" + crateName + " &ato " + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ()));
     }
 
     private void handleGiveKey(CommandSender sender, String[] args) {
         if (args.length < 3) {
-            sender.sendMessage(plugin.getMessageManager().getMessage("command.give-usage"));
+            sender.sendMessage(ColorUtils.color("&cUsage: /ariscrate give <key> <amount> | /ariscrate give <key> <player> <amount>"));
             return;
         }
 
@@ -178,7 +240,7 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
 
         if (isInteger(possibleNumber)) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(plugin.getMessageManager().getMessage("command.console-must-specify"));
+                sender.sendMessage(ColorUtils.color("&cConsole must specify player."));
                 return;
             }
             amount = Integer.parseInt(possibleNumber);
@@ -186,56 +248,50 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
         } else {
             target = Bukkit.getPlayerExact(possibleNumber);
             if (target == null) {
-                sender.sendMessage(plugin.getMessageManager().getMessage("command.player-not-found"));
+                sender.sendMessage(ColorUtils.color("&cPlayer not found"));
                 return;
             }
             if (args.length < 4 || !isInteger(args[3])) {
-                sender.sendMessage(plugin.getMessageManager().getMessage("command.give-usage"));
+                sender.sendMessage(ColorUtils.color("&cUsage: /ariscrate give <key> <player> <amount>"));
                 return;
             }
             amount = Integer.parseInt(args[3]);
         }
 
         plugin.getKeyManager().addKeys(target.getUniqueId(), key, amount);
-        sender.sendMessage(plugin.getMessageManager().getMessage("command.key-given")
-            .replace("{amount}", String.valueOf(amount))
-            .replace("{key}", key)
-            .replace("{target}", target.getName()));
+        sender.sendMessage(ColorUtils.color("&aGave &e" + amount + " &akey(s) " + key + " to &e" + target.getName()));
     }
 
     private void handleTakeKey(CommandSender sender, String[] args) {
         if (args.length < 4) {
-            sender.sendMessage(plugin.getMessageManager().getMessage("command.take-usage"));
+            sender.sendMessage(ColorUtils.color("&cUsage: /ariscrate take <key> <player> <amount>"));
             return;
         }
 
         String key = args[1];
         Player target = Bukkit.getPlayerExact(args[2]);
         if (target == null) {
-            sender.sendMessage(plugin.getMessageManager().getMessage("command.player-not-found"));
+            sender.sendMessage(ColorUtils.color("&cPlayer not found"));
             return;
         }
 
         if (!isInteger(args[3])) {
-            sender.sendMessage(plugin.getMessageManager().getMessage("command.invalid-number"));
+            sender.sendMessage(ColorUtils.color("&cAmount must be a number"));
             return;
         }
 
         int amount = Integer.parseInt(args[3]);
         boolean success = plugin.getKeyManager().takeKeys(target.getUniqueId(), key, amount);
         if (success) {
-            sender.sendMessage(plugin.getMessageManager().getMessage("command.key-taken")
-                .replace("{amount}", String.valueOf(amount))
-                .replace("{key}", key)
-                .replace("{target}", target.getName()));
+            sender.sendMessage(ColorUtils.color("&aTook &e" + amount + " &akey(s) " + key + " from &e" + target.getName()));
         } else {
-            sender.sendMessage(plugin.getMessageManager().getMessage("command.not-enough"));
+            sender.sendMessage(ColorUtils.color("&cPlayer does not have enough keys."));
         }
     }
 
     private void handleKeyAll(CommandSender sender, String[] args) {
         if (args.length < 3) {
-            sender.sendMessage(plugin.getMessageManager().getMessage("command.keyall-usage"));
+            sender.sendMessage(ColorUtils.color("&cUsage: /ariscrate keyall <crate> <amount>"));
             return;
         }
 
@@ -244,7 +300,7 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
         try {
             amount = Integer.parseInt(args[2]);
         } catch (NumberFormatException e) {
-            sender.sendMessage(plugin.getMessageManager().getMessage("command.invalid-number"));
+            sender.sendMessage(ColorUtils.color("&cAmount must be a number"));
             return;
         }
 
@@ -254,18 +310,13 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
         for (Player p : Bukkit.getOnlinePlayers()) {
             plugin.getKeyManager().addKeys(p.getUniqueId(), crate, amount);
             
-            p.sendMessage(plugin.getMessageManager().getRawMessage("command.keyall-header"));
-            p.sendMessage(plugin.getMessageManager().getRawMessage("command.keyall-message")
-                .replace("{amount}", String.valueOf(amount))
-                .replace("{key_name}", keyName)
-                .replace("{suffix}", suffix));
-            p.sendMessage(plugin.getMessageManager().getRawMessage("command.keyall-footer"));
+            p.sendMessage(ColorUtils.color("&8&m--------------------------------------------------"));
+            p.sendMessage(ColorUtils.color(" &a&lKEYALL &7» You received &e" + amount + " &f" + keyName + suffix + "!"));
+            p.sendMessage(ColorUtils.color("&8&m--------------------------------------------------"));
             
             p.sendTitle(
-                ColorUtils.color(plugin.getMessageManager().getRawMessage("command.keyall-title")),
-                ColorUtils.color(plugin.getMessageManager().getRawMessage("command.keyall-subtitle")
-                    .replace("{amount}", String.valueOf(amount))
-                    .replace("{key_name}", keyName)),
+                ColorUtils.color("#00FB4B&lKEYALL"),
+                ColorUtils.color("&f+" + amount + " &e" + keyName),
                 10, 60, 20
             );
             
@@ -276,9 +327,7 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
             p.playSound(p.getLocation(), toastSound, 1.0f, 1.0f);
         }
 
-        sender.sendMessage(plugin.getMessageManager().getMessage("command.keyall-sender")
-            .replace("{amount}", String.valueOf(amount))
-            .replace("{crate}", crate));
+        sender.sendMessage(ColorUtils.color("&aGave everyone &e" + amount + " &akey(s) for &e" + crate));
     }
 
     private boolean isInteger(String s) {
@@ -301,6 +350,8 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
             commands.add("crates");
             commands.add("delcrate");
             commands.add("additem");
+            commands.add("deleteitem");
+            commands.add("movehere");
             commands.add("give");
             commands.add("take");
             commands.add("keyall");
@@ -312,14 +363,14 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 2) {
             String subCmd = args[0].toLowerCase();
-            if (subCmd.equals("additem") || subCmd.equals("give") || subCmd.equals("take") || subCmd.equals("keyall") || subCmd.equals("delcrate")) {
+            if (subCmd.equals("additem") || subCmd.equals("deleteitem") || subCmd.equals("movehere") || subCmd.equals("give") || subCmd.equals("take") || subCmd.equals("keyall") || subCmd.equals("delcrate")) {
                 return new ArrayList<>(plugin.getCrateManager().getCrateNames());
             }
         }
 
         if (args.length == 3) {
             String subCmd = args[0].toLowerCase();
-            if (subCmd.equals("additem")) {
+            if (subCmd.equals("additem") || subCmd.equals("deleteitem")) {
                 List<String> slots = new ArrayList<>();
                 for (int i = 0; i < 27; i++) {
                     slots.add(String.valueOf(i));
@@ -359,4 +410,4 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
 
         return Collections.emptyList();
     }
-        }
+            }
