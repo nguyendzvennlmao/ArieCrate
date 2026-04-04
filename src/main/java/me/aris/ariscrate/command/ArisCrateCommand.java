@@ -4,6 +4,8 @@ import me.aris.ariscrate.ArisCrate;
 import me.aris.ariscrate.crate.Crate;
 import me.aris.ariscrate.utils.ColorUtils;
 import me.aris.ariscrate.utils.DogAdonisHook;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -307,9 +309,9 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
             
             if (actionbarEnabled) {
                 String actionbar = plugin.getMessageManager().getRawMessage("keyall-message.actionbar");
-                p.sendActionBar(ColorUtils.color(actionbar
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ColorUtils.color(actionbar
                     .replace("{amount}", String.valueOf(amount))
-                    .replace("{key_name}", keyName)));
+                    .replace("{key_name}", keyName))));
             }
             
             if (subtitleEnabled) {
@@ -467,4 +469,4 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
 
         return Collections.emptyList();
     }
-            }
+    }
