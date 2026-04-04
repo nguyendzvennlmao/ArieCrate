@@ -48,4 +48,4 @@ public class MessageManager {
         }
         return messages.stream().map(ColorUtils::color).toList();
     }
-            }
+                }
