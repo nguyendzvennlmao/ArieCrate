@@ -1,15 +1,18 @@
 sounds:
   gui-click: UI_BUTTON_CLICK
-  no-key: ENTITY_VILLAGER_NO
+  no-key: ENTITY_ILLAGER_CAST_SPELL
   reward: ENTITY_PLAYER_LEVELUP
-  keyall: ENTITY_PLAYER_LEVELUP
-  keyall-toast: UI_TOAST_CHALLENGE_COMPLETE
 
 settings:
-  hologram:
+  chat:
     enabled: true
-    height: 1.0
-  particles:
+  actionbar:
     enabled: true
-    amount: 10
-    speed: 1
+
+keyall:
+  enabled: true
+  subtitle:
+    enabled: true
+    format: "&f+{amount} &e{key_name}"
+  command: "acrate givekey {player} common 1"
+  time: 1h
