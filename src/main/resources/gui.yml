@@ -1,10 +1,13 @@
+# ArisCrate GUI Configuration
+
 choose-gui:
   title: "&8ᴄʜᴏᴏsᴇ 1 ɪᴛᴇᴍ"
   size: 27
   background:
     material: GRAY_STAINED_GLASS_PANE
     name: "&7"
-  permission: "ariscrate.user"
+    lore:
+      - "&7Select an item to receive"
 
 confirm-gui:
   title: "&8ᴄᴏɴғɪʀᴍ"
@@ -12,19 +15,18 @@ confirm-gui:
   background:
     material: BLACK_STAINED_GLASS_PANE
     name: "&7"
-  permission: "ariscrate.user"
+    lore:
+      - "&7Confirm your selection"
   items:
     cancel:
       material: RED_STAINED_GLASS_PANE
       name: "#FB0000ᴄᴀɴᴄᴇʟ"
       slot: 11
-      permission: "ariscrate.cancel"
       lore:
         - "&7Click to cancel"
     confirm:
       material: LIME_STAINED_GLASS_PANE
       name: "#00FB4Bᴄᴏɴғɪʀᴍ"
       slot: 15
-      permission: "ariscrate.confirm"
       lore:
         - "&7Click to confirm"
