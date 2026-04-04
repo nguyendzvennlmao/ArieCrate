@@ -1,7 +1,19 @@
 prefix: "&8[&6ArisCrate&8] &7"
 
+help:
+  header: "&6&l===== &e&lArisCrate Help &6&l====="
+  crates: "&e/acrate crates <name> &7- Create a new crate at target block"
+  delcrate: "&e/acrate delcrate <name> &7- Delete a crate"
+  additem: "&e/acrate additem <crate> <slot> &7- Add item in hand to crate slot"
+  deleteitem: "&e/acrate deleteitem <crate> <slot> &7- Delete item from crate slot"
+  movehere: "&e/acrate movehere <crate> &7- Move crate to target block"
+  givekey: "&e/acrate givekey <key> <amount> &7- Give key to all online players"
+  givekeyplayer: "&e/acrate givekeyplayer <player> <key> <amount> &7- Give key to specific player"
+  takekey: "&e/acrate takekey <player> <key> <amount> &7- Take key from player"
+  reload: "&e/acrate reload &7- Reload all configurations"
+  footer: "&6&l========================="
+
 command:
-  usage: "&cUsage: /ariscrate <crates|delcrate|additem|deleteitem|movehere|give|take|keyall|reload>"
   only-player: "&cThis command can only be used by players."
   console-must-specify: "&cConsole must specify player."
   player-not-found: "&cPlayer not found"
@@ -10,40 +22,37 @@ command:
   reloaded: "&aPlugin reloaded successfully!"
   no-permission: "&cYou don't have permission to use this command!"
   
-  create-usage: "&cUsage: /ariscrate crates <name>"
+  create-usage: "&cUsage: /acrate crates <name>"
   crate-exists: "&cCrate &e{name} &calready exists!"
   crate-created: "&aCreated crate &e{name} &aat {x},{y},{z}"
+  config-created: "&aConfig file created: &ecrate/{name}.yml"
   
-  delete-usage: "&cUsage: /ariscrate delcrate <name>"
+  delete-usage: "&cUsage: /acrate delcrate <name>"
   crate-deleted: "&aDeleted crate &e{name}"
   crate-not-exist: "&cCrate &e{name} &cdoes not exist."
   
-  additem-usage: "&cUsage: /ariscrate additem <crate> <slot>"
+  additem-usage: "&cUsage: /acrate additem <crate> <slot>"
   crate-not-exist-add: "&cCrate &e{crate} &cdoes not exist."
   hold-item: "&cYou must hold an item in your hand."
   item-added: "&aAdded item to crate &e{crate}&a at slot &e{slot}"
   
-  deleteitem-usage: "&cUsage: /ariscrate deleteitem <crate> <slot>"
+  deleteitem-usage: "&cUsage: /acrate deleteitem <crate> <slot>"
   item-deleted: "&aDeleted item from crate &e{crate}&a at slot &e{slot}"
   no-item-at-slot: "&cNo item found at slot &e{slot}"
   
-  movehere-usage: "&cUsage: /ariscrate movehere <crate>"
-  crate-moved: "&aMoved crate &e{crate} &ato {x},{y},{z}"
+  movehere-usage: "&cUsage: /acrate movehere <crate>"
+  crate-moved: "&aMoved crate &e{name} &afrom {old_x},{old_y},{old_z}"
+  crate-moved-to: "&aTo new location: &e{x},{y},{z}"
   
-  give-usage: "&cUsage: /ariscrate give <key> <amount> | /ariscrate give <key> <player> <amount>"
-  key-given: "&aGave &e{amount} &akey(s) {key} to &e{target}"
+  givekey-usage: "&cUsage: /acrate givekey <key> <amount>"
+  givekeyplayer-usage: "&cUsage: /acrate givekeyplayer <player> <key> <amount>"
+  key-given-all: "&aGave &e{amount} &akey(s) {key} to all online players"
+  key-given-player: "&aGave &e{amount} &akey(s) {key} to &e{target}"
+  keyall-cooldown: "&cYou must wait {time} before using givekey again!"
   
-  take-usage: "&cUsage: /ariscrate take <key> <player> <amount>"
+  takekey-usage: "&cUsage: /acrate takekey <player> <key> <amount>"
   key-taken: "&aTook &e{amount} &akey(s) {key} from &e{target}"
   not-enough: "&cPlayer does not have enough keys."
-  
-  keyall-usage: "&cUsage: /ariscrate keyall <crate> <amount>"
-  keyall-header: "&8&m--------------------------------------------------"
-  keyall-message: " &a&lKEYALL &7» You received &e{amount} &f{key_name}{suffix}!"
-  keyall-footer: "&8&m--------------------------------------------------"
-  keyall-title: "#00FB4B&lKEYALL"
-  keyall-subtitle: "&f+{amount} &e{key_name}"
-  keyall-sender: "&aGave everyone &e{amount} &akey(s) for &e{crate}"
 
 crate:
   no-key: "&cYou don't have a key for this crate!"
@@ -51,3 +60,11 @@ crate:
   not-enough-keys: "&cYou don't have enough keys."
   received-broadcast: "&7Player #0EFF90{player} &7received item &7[{item}&7]!"
   need-permission: "&cYou need {permission} to use this crate!"
+
+keyall-message:
+  chat:
+    - "&8&m----------------------------------------"
+    - "   &6&lKEYALL &7» You received &e{amount} &f{key_name}"
+    - "&8&m----------------------------------------"
+  actionbar: "&a✔ &7Received &e{amount} &f{key_name}"
+  subtitle: "&f+{amount} &e{key_name}"
