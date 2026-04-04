@@ -5,14 +5,12 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class MessageManager {
     private final ArisCrate plugin;
     private File messageFile;
     private FileConfiguration messages;
-    private final Map<String, String> messageCache = new HashMap<>();
 
     public MessageManager(ArisCrate plugin) {
         this.plugin = plugin;
@@ -24,7 +22,6 @@ public class MessageManager {
             plugin.saveResource("message.yml", false);
         }
         messages = YamlConfiguration.loadConfiguration(messageFile);
-        messageCache.clear();
     }
 
     public String getMessage(String path) {
@@ -43,4 +40,12 @@ public class MessageManager {
         }
         return ColorUtils.color(message);
     }
-                               }
+    
+    public List<String> getMessageList(String path) {
+        List<String> messages = this.messages.getStringList(path);
+        if (messages == null || messages.isEmpty()) {
+            return List.of(ColorUtils.color("&cMessage not found: " + path));
+        }
+        return messages.stream().map(ColorUtils::color).toList();
+    }
+            }
