@@ -27,7 +27,7 @@ public class BlockInteractListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInteract(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) {
             if (event.getClickedBlock() != null) {
                 Location clickedLoc = event.getClickedBlock().getLocation();
                 
@@ -42,8 +42,9 @@ public class BlockInteractListener implements Listener {
                     if (crate.getCrateConfig() != null) {
                         String permission = crate.getCrateConfig().getString("permission");
                         if (permission != null && !player.hasPermission(permission)) {
-                            player.sendMessage(plugin.getMessageManager().getMessage("crate.need-permission")
-                                .replace("{permission}", permission));
+                            String msg = plugin.getMessageManager().getRawMessage("crate.need-permission")
+                                .replace("{permission}", permission);
+                            player.sendMessage(ColorUtils.color(msg));
                             return;
                         }
                     }
@@ -93,4 +94,4 @@ public class BlockInteractListener implements Listener {
                a.getBlockY() == b.getBlockY() && 
                a.getBlockZ() == b.getBlockZ();
     }
-                                              }
+                }
