@@ -1,5 +1,5 @@
 name: ArisCrate
-version: 1.0.0
+version: 1.1
 main: me.aris.ariscrate.ArisCrate
 api-version: 1.20
 folia-supported: true
@@ -9,19 +9,10 @@ description: Advanced crate plugin with key system
 commands:
   ariscrate:
     description: Main command for ArisCrate
-    usage: /ariscrate
-    aliases: [acrate, ariscrates]
+    usage: /acrate help
+    aliases: [acrate]
 
 permissions:
   ariscrate.admin:
     description: Admin permissions for ArisCrate
     default: op
-  ariscrate.user:
-    description: User permissions for ArisCrate
-    default: true
-  ariscrate.cancel:
-    description: Cancel permission
-    default: true
-  ariscrate.confirm:
-    description: Confirm permission
-    default: true
