@@ -48,7 +48,7 @@ public class GuiListener implements Listener {
                     if (crateName != null) {
                         int keys = plugin.getKeyManager().getKeys(player.getUniqueId(), crateName);
                         if (keys <= 0) {
-                            Sound sound = Sound.valueOf(plugin.getConfig().getString("sounds.no-key", "ENTITY_VILLAGER_NO"));
+                            Sound sound = Sound.valueOf(plugin.getConfig().getString("sounds.no-key", "ENTITY_ILLAGER_CAST_SPELL"));
                             player.playSound(player.getLocation(), sound, 1.0f, 1.0f);
                             player.sendMessage(plugin.getMessageManager().getMessage("crate.no-key"));
                         } else {
@@ -74,6 +74,7 @@ public class GuiListener implements Listener {
                             String cancelMaterial = plugin.getGuiConfig().getString("confirm-gui.items.cancel.material", "RED_STAINED_GLASS_PANE");
                             String cancelName = plugin.getGuiConfig().getString("confirm-gui.items.cancel.name", "#FB0000ᴄᴀɴᴄᴇʟ");
                             int cancelSlot = plugin.getGuiConfig().getInt("confirm-gui.items.cancel.slot", 11);
+                            
                             ItemStack cancel = new ItemStack(Material.valueOf(cancelMaterial));
                             ItemMeta cancelMeta = cancel.getItemMeta();
                             cancelMeta.setDisplayName(ColorUtils.color(cancelName));
@@ -85,6 +86,7 @@ public class GuiListener implements Listener {
                             String confirmMaterial = plugin.getGuiConfig().getString("confirm-gui.items.confirm.material", "LIME_STAINED_GLASS_PANE");
                             String confirmName = plugin.getGuiConfig().getString("confirm-gui.items.confirm.name", "#00FB4Bᴄᴏɴғɪʀᴍ");
                             int confirmSlot = plugin.getGuiConfig().getInt("confirm-gui.items.confirm.slot", 15);
+                            
                             ItemStack ok = new ItemStack(Material.valueOf(confirmMaterial));
                             ItemMeta okMeta = ok.getItemMeta();
                             okMeta.setDisplayName(ColorUtils.color(confirmName));
@@ -117,14 +119,14 @@ public class GuiListener implements Listener {
                     String crateName = plugin.getSelectingCrate().get(player.getUniqueId());
                     Crate crate = plugin.getCrateManager().getCrate(crateName);
                     if (crate == null) {
-                        Sound sound = Sound.valueOf(plugin.getConfig().getString("sounds.no-key", "ENTITY_VILLAGER_NO"));
+                        Sound sound = Sound.valueOf(plugin.getConfig().getString("sounds.no-key", "ENTITY_ILLAGER_CAST_SPELL"));
                         player.playSound(player.getLocation(), sound, 1.0f, 1.0f);
                         player.sendMessage(plugin.getMessageManager().getMessage("crate.no-key-found"));
                         player.closeInventory();
                     } else {
                         boolean removed = plugin.getKeyManager().removeKey(player.getUniqueId(), crate.getName());
                         if (!removed) {
-                            Sound sound = Sound.valueOf(plugin.getConfig().getString("sounds.no-key", "ENTITY_VILLAGER_NO"));
+                            Sound sound = Sound.valueOf(plugin.getConfig().getString("sounds.no-key", "ENTITY_ILLAGER_CAST_SPELL"));
                             player.playSound(player.getLocation(), sound, 1.0f, 1.0f);
                             player.sendMessage(plugin.getMessageManager().getMessage("crate.no-key-found"));
                             player.closeInventory();
@@ -157,4 +159,4 @@ public class GuiListener implements Listener {
             event.setCancelled(true);
         }
     }
-                                                  }
+                }
