@@ -42,7 +42,7 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
         }
 
         switch (args[0].toLowerCase()) {
-            case "crates":
+            case "create":
                 if (!(sender instanceof Player)) {
                     sender.sendMessage(plugin.getMessageManager().getMessage("command.only-player"));
                     return true;
@@ -99,7 +99,7 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
 
     private void sendHelp(CommandSender sender) {
         sender.sendMessage(ColorUtils.color(plugin.getMessageManager().getRawMessage("help.header")));
-        sender.sendMessage(ColorUtils.color(plugin.getMessageManager().getRawMessage("help.crates")));
+        sender.sendMessage(ColorUtils.color(plugin.getMessageManager().getRawMessage("help.create")));
         sender.sendMessage(ColorUtils.color(plugin.getMessageManager().getRawMessage("help.delcrate")));
         sender.sendMessage(ColorUtils.color(plugin.getMessageManager().getRawMessage("help.additem")));
         sender.sendMessage(ColorUtils.color(plugin.getMessageManager().getRawMessage("help.deleteitem")));
@@ -320,8 +320,10 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
                     .replace("{key_name}", keyName)), 10, 40, 10);
             }
             
-            Sound sound = Sound.valueOf(plugin.getConfig().getString("sounds.keyall", "ENTITY_PLAYER_LEVELUP"));
-            p.playSound(p.getLocation(), sound, 1.0f, 1.0f);
+            try {
+                Sound sound = Sound.valueOf(plugin.getConfig().getString("sounds.keyall", "ENTITY_PLAYER_LEVELUP"));
+                p.playSound(p.getLocation(), sound, 1.0f, 1.0f);
+            } catch (Exception ignored) {}
         }
 
         String msg = plugin.getMessageManager().getRawMessage("command.key-given-all")
@@ -400,7 +402,7 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 1) {
             List<String> commands = new ArrayList<>();
-            commands.add("crates");
+            commands.add("create");
             commands.add("delcrate");
             commands.add("additem");
             commands.add("deleteitem");
@@ -427,6 +429,9 @@ public class ArisCrateCommand implements CommandExecutor, TabCompleter {
             }
             if (subCmd.equals("givekey")) {
                 return new ArrayList<>(plugin.getCrateManager().getCrateNames());
+            }
+            if (subCmd.equals("create")) {
+                return Collections.emptyList();
             }
         }
 
